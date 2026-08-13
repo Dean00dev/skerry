@@ -193,8 +193,8 @@ test('JSON and SARIF reports are written where asked', () => {
   assert.equal(json.counts.error, 2);
   assert.equal(sarif.version, '2.1.0');
   assert.equal(
-    path.normalize(r.outputs['report-json-path']),
-    path.resolve(dir, 'out', 'report.json')
+    fs.realpathSync(r.outputs['report-json-path']),
+    fs.realpathSync(path.join(dir, 'out', 'report.json'))
   );
 });
 

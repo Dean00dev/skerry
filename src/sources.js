@@ -117,17 +117,28 @@ function fromFs(dir, maxEntries = MAX_ENTRIES, maxDepth = MAX_DEPTH) {
       let dirent;
       while ((dirent = directory.readSync()) !== null) {
         const rel = current.rel === '' ? dirent.name : `${current.rel}/${dirent.name}`;
+        const abs = path.join(current.abs, dirent.name);
         if (current.rel === '' && dirent.name === '.git') continue;
 
-        if (dirent.isSymbolicLink()) {
+        // Node 20 on Windows can classify a directory symlink/junction as a
+        // directory in Dirent. lstat is authoritative and prevents following
+        // a reparse point into a loop or outside the requested tree.
+        let stat;
+        try {
+          stat = fs.lstatSync(abs);
+        } catch (err) {
+          throw new SourceError(`cannot inspect path: ${shortError(err)}`);
+        }
+
+        if (stat.isSymbolicLink()) {
           pushEntry(entries, { path: rel, mode: '120000' }, maxEntries, maxDepth);
-        } else if (dirent.isDirectory()) {
+        } else if (stat.isDirectory()) {
           if (current.depth >= maxDepth) {
             throw new SourceError(
               `filesystem tree exceeds the safety limit of ${maxDepth} directory levels; refusing to report on an incomplete scan`
             );
           }
-          stack.push({ abs: path.join(current.abs, dirent.name), rel, depth: current.depth + 1 });
+          stack.push({ abs, rel, depth: current.depth + 1 });
         } else {
           pushEntry(entries, { path: rel, mode: '100644' }, maxEntries, maxDepth);
         }
