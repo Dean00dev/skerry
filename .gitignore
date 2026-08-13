@@ -1,0 +1,8 @@
+node_modules/
+*.log
+.DS_Store
+skerry-report.json
+skerry-report.sarif
+coverage/
+.idea/
+.vscode/
