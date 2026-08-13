@@ -1,4 +1,4 @@
-name: 'Skerry'
+name: 'Skerry Path Guard'
 description: 'Fail the build when a filename cannot be checked out safely on Windows or macOS. Never reads scanned file contents.'
 author: 'Dean Egan'
 

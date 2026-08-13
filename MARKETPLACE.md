@@ -15,7 +15,7 @@ until the draft release form is opened. If GitHub rejects it, use the first
 fallback that is accepted, and change `name:` in `action.yml` to match:
 
 1. `Skerry`
-2. `Skerry Path Check`
+2. `Skerry Filename Guard`
 3. `Skerry Path Audit`
 
 The repository name stays `skerry` either way.
