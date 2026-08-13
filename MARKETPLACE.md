@@ -122,10 +122,10 @@ Full descriptions, including when each rule is wrong, are in `docs/RULES.md`.
 
 ## Verification
 
-169 automated tests pass locally, including end-to-end runs of the real
-entrypoint against a real git repository containing real hazardous filenames.
-`VERIFICATION.md` separates what was executed from what was only simulated, and
-lists what has not been demonstrated on GitHub's runners yet.
+169 automated tests pass locally and on GitHub's Ubuntu, macOS and Windows
+runners with Node 20, 22 and 24. Live jobs also run the Action against clean and
+hazardous inputs and consume its outputs downstream. `VERIFICATION.md` links the
+successful run and separates demonstrated behaviour from the remaining gaps.
 
 ## Provenance
 

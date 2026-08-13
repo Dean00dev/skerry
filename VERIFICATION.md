@@ -7,11 +7,12 @@ This document exists so that nothing in this repository has to be taken on
 trust. It separates what was actually executed from what was simulated and what
 has not been demonstrated at all.
 
-**Skerry has never run on GitHub.** It has never been published, pushed,
-released, or listed on Marketplace. Claude's baseline was produced locally on
-Node 22.22.2 with network disabled. ChatGPT / Super Sol independently reproduced
-the baseline and verified the reviewed state on Node 24.14.0, Linux x86_64,
-git 2.51.1. Web access was used only to check current primary documentation.
+Skerry is now public on GitHub and has run successfully in GitHub Actions on
+Ubuntu, macOS and Windows with Node 20, 22 and 24. It has **not** been released
+or listed on Marketplace. Claude's baseline was produced locally on Node
+22.22.2 with network disabled. ChatGPT / Super Sol independently reproduced the
+baseline, reviewed the implementation, and integrated it on GitHub. The final
+local state passed on Node 24.14.0, Linux x86_64, git 2.51.1.
 
 ---
 
@@ -27,8 +28,12 @@ Every gate was executed in one sequence on the final state of the repository.
 | JavaScript syntax | `node --check` on all 22 `.js` files | all parse |
 | YAML parse | Python `yaml.safe_load` on 5 files | all parse |
 | Self scan, strictest | `node src/index.js --fail-on warning` | 55 paths, 0 findings, exit 0 |
+| GitHub matrix | Ubuntu, macOS, Windows × Node 20, 22, 24 | **9/9 passed** |
+| Live Action: clean | Skerry on its own checkout | 55 tracked paths, 0 findings |
+| Live Action: catches | Skerry on hazardous manifest | 6 errors, expected failure observed |
+| Live step outputs | Action outputs consumed downstream | `findings=0`, `scanned=55`, `source=git` |
 
-Repository inventory: 55 files, 1,555 lines of source across 8 modules, 1,476
+Repository inventory: 55 files, 1,566 lines of source across 8 modules, 1,461
 lines of test across 11 files, 9 hazardous fixture manifests, **0 runtime
 dependencies**, no `dist/`, no `node_modules/`.
 
@@ -106,32 +111,38 @@ Confirmed by reading real files from disk:
   `summary: false` leaves the summary file untouched
 - Every emitted annotation matches `^::(error|warning|notice) [^:]*::`
 
-**A real git repository was created and scanned.** Real files named `nul`,
-`report:2026.csv`, and a real `config.json` / `Config.json` case collision were
-committed to a throwaway repository in `/tmp`, and Skerry caught SK001, SK004
-and SK005 via `git ls-files`. An untracked hazardous file was correctly ignored,
-proving the git source sees only tracked paths.
+**A real git repository was created and scanned.** A tracked filename containing
+U+202E RIGHT-TO-LEFT OVERRIDE was added to a throwaway repository and Skerry
+caught SK009 via `git ls-files`. An untracked hazardous filename was correctly
+ignored, proving the git source sees only tracked paths. Host-illegal Windows
+names and case collisions remain manifest fixtures because those paths cannot
+be represented on every runner filesystem.
 
-**Skerry scanned its own repository as a real git checkout.** A copy was
-`git init`-ed and committed; Skerry read 51 tracked paths via the git source and
-found nothing at `fail-on: warning`. Step outputs were parsed back from a real
-`$GITHUB_OUTPUT` file and included `source=git`, `scanned=51`, `passed=true`.
+**Skerry scanned its own repository as a real GitHub checkout.** The live Action
+read 55 tracked paths via the git source and found nothing at `fail-on: warning`.
+A downstream step read the real outputs and confirmed `source=git`,
+`scanned=55`, `findings=0`.
 
 ---
 
-## 4 · Simulated, not live
+## 4 · Live GitHub execution
 
-The distinction matters, so it is stated plainly.
+GitHub Actions run
+[`31697656821`](https://github.com/Dean00dev/skerry/actions/runs/31697656821)
+completed successfully at commit `0001629384b75697039504117903478b88daab59`.
 
-| Simulated locally | What has not been shown |
+| Live evidence | Result |
 | --- | --- |
-| Runner environment variables set by hand | How GitHub's runner actually invokes the Action |
-| `$GITHUB_OUTPUT` written and parsed back | That GitHub reads those outputs as expected |
-| `$GITHUB_STEP_SUMMARY` written | How GitHub renders the summary table |
-| Annotation strings emitted and pattern-matched | How annotations render on a pull request, or whether `file=` binds to a diff line |
-| `action.yml` parsed with a YAML parser | That GitHub accepts the metadata |
+| Unit/end-to-end matrix | Ubuntu, macOS and Windows on Node 20, 22 and 24 all passed |
+| Metadata and secrets | JavaScript syntax, YAML parsing, metadata and credential scan passed |
+| Real Action, clean checkout | 55 tracked paths, 0 findings, strictest setting passed |
+| Real Action, hazardous manifest | 6 errors found; the expected failing outcome was asserted |
+| Real Action outputs | A downstream step read `findings=0`, `scanned=55`, `source=git` |
 
-Nothing in this document establishes how github.com behaves.
+The local runner simulation remains useful because it directly reads the
+output and summary files and attacks their escaping. The live jobs now also
+establish that GitHub accepts `action.yml`, invokes the Node 24 entrypoint,
+recognises failure, and exposes step outputs to later steps.
 
 ---
 
@@ -139,21 +150,6 @@ Nothing in this document establishes how github.com behaves.
 
 Honest gaps. None is hidden.
 
-- **The Action has never run on a GitHub runner.** The CI workflow in
-  `.github/workflows/ci.yml` is written but has never executed. Its five jobs —
-  a 9-cell test matrix, metadata, self-clean, self-catches, self-outputs — are
-  untested as workflows. The `self-catches` job asserts `errors=6`, which was
-  verified locally against the same fixture; whether the job as written runs is
-  not.
-- **Node 24 has now been used locally.** The reviewed state passed on
-  **Node 24.14.0**. It has still not run under GitHub's embedded Node 24 Action
-  runtime.
-- **Windows and macOS have not been used.** Every run was on Linux. Rules about
-  Windows and macOS filesystem behaviour are implemented from documented
-  behaviour, not measured on those systems. Tests that create hazardous files
-  probe the host first and skip themselves where the filesystem cannot
-  represent the name — on Linux, none skipped, so the skip path itself is
-  untested.
 - **Marketplace eligibility is unconfirmed.** The requirements are met as
   documented — public repository, single `action.yml` at the root, unique name,
   branding present — but GitHub's acceptance, and whether the name `Skerry` is
@@ -177,15 +173,11 @@ Honest gaps. None is hidden.
 
 Nothing in this project can do any of these, and nothing attempted to.
 
-1. Create the repository `skerry`, public, **without** a README, licence or
-   .gitignore
-2. Upload the archive contents with `action.yml` at the root
-3. Enable Issues and Private vulnerability reporting
-4. Confirm CI is green — this is the first real execution of the Action
-5. Accept the Marketplace Developer Agreement
-6. Draft the release, resolve any name conflict, choose the categories
-7. Create the moving `v1` tag after release
-8. Test the published Action from a different repository
+1. Enable Issues and Private vulnerability reporting if not already enabled
+2. Accept the Marketplace Developer Agreement
+3. Draft the release, resolve any name conflict, choose the categories
+4. Create the moving `v1` tag after release
+5. Test the published Action from a different repository
 
 Full sequence in `RELEASE_CHECKLIST.md`.
 
@@ -237,21 +229,32 @@ any modification. The integration review then made these disclosed changes:
 9. **CI supply-chain references were stale or floating.** CI now uses
    `actions/checkout@v6` and `actions/setup-node@v7`, and pins its CI-only YAML
    parser to `PyYAML==6.0.3`. Runtime dependencies remain zero.
+10. **The first live matrix exposed non-portable test fixtures.** Windows path
+    separators, macOS's `/var` → `/private/var` alias, and host-illegal fixture
+    names were being asserted as if every filesystem behaved like Linux. Report
+    paths are now compared by filesystem identity and the real-Git fixture uses
+    a portable U+202E filename.
+11. **Node 20 on Windows exposed a symlink traversal hazard.** Its `Dirent`
+    classification can report a directory symlink/junction as a directory. The
+    filesystem walker now checks every entry with `lstat`, records symlinks, and
+    never follows them. This was a production hardening fix, not merely a test
+    adjustment.
 
 ---
 
 ## 8 · The claim this project does and does not make
 
-Skerry is **not described as production-ready**, because it has never run in
-production, on a real runner, or on any repository other than its own.
+Skerry is **not described as production-ready**. A successful CI matrix is
+strong pre-release evidence, not evidence of production use or real-world
+false-positive rates.
 
 What the evidence supports: the implementation is complete, its rules behave as
 documented against real and adversarial input, it handles hostile filenames
 without allowing them to alter its output, it is deterministic, and it has no
 dependencies.
 
-What the evidence does not support: anything about GitHub's runner, GitHub's
-rendering, Marketplace acceptance, non-Linux platforms, or behaviour on
+What the evidence does not support: Marketplace acceptance, pull-request diff
+annotation rendering, performance near the documented caps, or behaviour on
 repositories it has never seen.
 
 ---

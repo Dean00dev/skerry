@@ -9,7 +9,23 @@
     "os": "Linux x86_64",
     "network": "enabled for primary-documentation checks only"
   },
-  "published_to_github": false,
+  "published_to_github": true,
+  "github": {
+    "repository": "https://github.com/Dean00dev/skerry",
+    "verified_commit": "0001629384b75697039504117903478b88daab59",
+    "successful_run": "https://github.com/Dean00dev/skerry/actions/runs/31697656821",
+    "runner_matrix": [
+      "ubuntu-latest / Node 20",
+      "ubuntu-latest / Node 22",
+      "ubuntu-latest / Node 24",
+      "macos-latest / Node 20",
+      "macos-latest / Node 22",
+      "macos-latest / Node 24",
+      "windows-latest / Node 20",
+      "windows-latest / Node 22",
+      "windows-latest / Node 24"
+    ]
+  },
   "gates": [
     {
       "name": "test suite",
@@ -56,10 +72,33 @@
     },
     {
       "name": "self scan via git source",
-      "command": "real git checkout of this repo",
+      "command": "live GitHub Action on its own checkout",
       "result": "pass",
-      "paths": 51,
+      "paths": 55,
       "findings": 0,
+      "source": "git"
+    },
+    {
+      "name": "github runner matrix",
+      "command": "Ubuntu, macOS, Windows x Node 20, 22, 24",
+      "result": "pass",
+      "jobs_passed": 9,
+      "jobs_failed": 0
+    },
+    {
+      "name": "live action catches hazards",
+      "command": "Action against hazardous manifest",
+      "result": "pass",
+      "expected_action_outcome": "failure",
+      "errors": 6,
+      "passed_output": false
+    },
+    {
+      "name": "live action outputs",
+      "command": "consume step outputs downstream",
+      "result": "pass",
+      "findings": 0,
+      "paths": 55,
       "source": "git"
     }
   ],
@@ -92,7 +131,11 @@
       "determinism byte-identical",
       "no secret or env disclosure",
       "end-to-end via child process",
-      "real git repo with real hazardous filenames"
+      "real git repo with a portable hazardous filename",
+      "GitHub Actions on Ubuntu, macOS and Windows",
+      "Node 20, 22 and 24",
+      "live clean and failing Action invocations",
+      "live downstream step outputs"
     ],
     "simulated": [
       "runner environment variables",
@@ -101,23 +144,16 @@
       "annotation string emission"
     ],
     "not_demonstrated": [
-      "execution on a GitHub runner",
-      "the CI workflow itself",
-      "GitHub's embedded Node 24 Action runtime",
-      "Windows",
-      "macOS",
       "Marketplace acceptance",
       "name availability",
+      "pull-request diff annotation rendering",
       "unaffiliated human review",
       "false positive rate in the wild",
       "performance near the documented caps",
       "SARIF schema validation"
     ],
     "owner_required": [
-      "create public repo named skerry with no README/licence/gitignore",
-      "upload archive with action.yml at root",
       "enable Issues and private vulnerability reporting",
-      "confirm CI green",
       "accept Marketplace Developer Agreement",
       "draft release v1.0.0 and publish",
       "create moving v1 tag",
@@ -133,7 +169,9 @@
     "filesystem directory and manifest allocation could precede cap enforcement; entries now stream and manifests are size-checked",
     "auto source could hide git collection failure with a filesystem fallback; detected work trees now fail closed",
     "names-only wording ignored that source list reads a manifest; clarified the trust boundary",
-    "CI action majors were stale and PyYAML floated; updated action majors and pinned PyYAML 6.0.3"
+    "CI action majors were stale and PyYAML floated; updated action majors and pinned PyYAML 6.0.3",
+    "live CI exposed Linux-specific path and filename assumptions in tests; made the fixtures portable and compared filesystem identity",
+    "Node 20 on Windows could classify a directory symlink as a directory; filesystem traversal now uses lstat and never follows it"
   ],
   "dependencies": {
     "runtime": 0,
@@ -144,9 +182,9 @@
   "file_count": 55,
   "inventory": {
     "source_modules": 8,
-    "source_lines": 1555,
+    "source_lines": 1566,
     "test_files": 11,
-    "test_lines": 1476,
+    "test_lines": 1461,
     "script_files": 3,
     "fixture_manifests": 9,
     "yaml_files": 5

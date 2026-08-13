@@ -30,7 +30,11 @@ Skerry exists because some paths cannot be checked out on Windows and macOS. If 
 
 So the hazardous paths live inside text files as data. The scanner cannot tell the difference between a manifest and a real checkout.
 
-Real hazardous files *are* created during testing, in a throwaway temp directory, and only after `test/e2e.test.js` probes whether the host filesystem can represent them. On Windows and macOS those tests skip themselves and say so.
+A real hazardous filename containing a bidirectional override is created during
+testing in a throwaway Git repository. It is portable enough to exist on Linux,
+macOS and Windows, and verifies that the git source scans tracked paths while
+ignoring untracked ones. Host-illegal Windows names and case collisions remain
+manifest data so the repository and test checkout stay portable.
 
 There is a CI job that runs Skerry against its own repository and requires a clean result at `fail-on: warning`. Skerry passing its own strictest setting is a standing check that this discipline holds.
 
