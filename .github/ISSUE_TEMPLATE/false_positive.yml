@@ -1,0 +1,30 @@
+name: False positive
+description: A rule fired on a legitimate filename
+labels: [false-positive]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the most valuable report you can send. A rule that fires on
+        legitimate names is worse than no rule.
+  - type: input
+    id: rule
+    attributes:
+      label: Rule id
+      placeholder: SK003
+    validations:
+      required: true
+  - type: textarea
+    id: path
+    attributes:
+      label: The path, as a manifest line
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why the name is legitimate
+      description: Which platforms it works on, and what the name is for.
+    validations:
+      required: true

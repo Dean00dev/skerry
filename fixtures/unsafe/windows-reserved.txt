@@ -1,0 +1,7 @@
+# Windows reserved device names, bare and with extensions, files and folders.
+nul
+scripts/CON.txt
+lib/aux/helpers.js
+build/com1.log
+build/LPT9.tmp
+docs/prn.md

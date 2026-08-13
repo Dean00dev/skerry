@@ -1,0 +1,5 @@
+# Trailing dots and spaces are silently stripped by Windows.
+reports/summary.
+config/settings 
+data/ leading-space.csv
+notes/folder. /inner.md

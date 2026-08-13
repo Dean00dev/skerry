@@ -1,0 +1,8 @@
+# Illegal on Windows: < > : " backslash | ? *
+data/report:2026.csv
+src/what?.js
+logs/out<1>.log
+weird/back\slash.txt
+quotes/"quoted".md
+glob/star*.tmp
+pipe/a|b.txt

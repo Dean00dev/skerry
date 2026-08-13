@@ -1,0 +1,6 @@
+# Filenames that try to forge workflow commands or hijack the terminal.
+evil/::add-mask::hunter2.txt
+evil/100%-complete,really.md
+evil/::set-output name=passed::true.js
+evil/[31mred[0m.log
+evil/::error file=/etc/passwd::pwned.md

@@ -1,0 +1,83 @@
+name: 'Skerry'
+description: 'Fail the build when a filename cannot be checked out safely on Windows or macOS. Never reads scanned file contents.'
+author: 'Dean Egan'
+
+branding:
+  icon: 'anchor'
+  color: 'blue'
+
+inputs:
+  path:
+    description: 'Directory to scan, relative to the workspace.'
+    required: false
+    default: '.'
+  ignore:
+    description: 'Newline or comma separated glob patterns to exclude. Supports *, ** and ?. A trailing / matches a directory and everything under it.'
+    required: false
+    default: ''
+  fail-on:
+    description: 'Severity threshold that fails the step: error, warning, or never.'
+    required: false
+    default: 'error'
+  max-path-length:
+    description: 'Repository-relative path length that triggers SK008. Set to 0 to disable the check.'
+    required: false
+    default: '200'
+  max-findings:
+    description: 'Maximum findings to print. Counts and the pass/fail decision always use the full set.'
+    required: false
+    default: '500'
+  disable:
+    description: 'Comma separated rule ids to switch off, for example SK003,SK008.'
+    required: false
+    default: ''
+  annotations:
+    description: 'Emit GitHub annotations. Set to false for plain text log output instead.'
+    required: false
+    default: 'true'
+  summary:
+    description: 'Write a table to the job summary.'
+    required: false
+    default: 'true'
+  report-json:
+    description: 'Write a JSON report to this path. Empty means no report.'
+    required: false
+    default: ''
+  report-sarif:
+    description: 'Write a SARIF 2.1.0 report to this path. Empty means no report. Uploading it is your choice and needs your own security-events permission.'
+    required: false
+    default: ''
+  source:
+    description: 'Where the path list comes from: auto, git, fs, or list.'
+    required: false
+    default: 'auto'
+  paths-file:
+    description: 'Newline separated path manifest, required when source is list.'
+    required: false
+    default: ''
+
+outputs:
+  findings:
+    description: 'Total number of findings.'
+  errors:
+    description: 'Number of error severity findings.'
+  warnings:
+    description: 'Number of warning severity findings.'
+  notices:
+    description: 'Number of notice severity findings.'
+  scanned:
+    description: 'Number of paths scanned after ignore patterns were applied.'
+  ignored:
+    description: 'Number of paths excluded by ignore patterns.'
+  passed:
+    description: 'true when the scan is below the fail-on threshold, otherwise false.'
+  source:
+    description: 'The path source actually used: git, fs, or list.'
+  report-json-path:
+    description: 'Absolute path of the JSON report, or empty.'
+  report-sarif-path:
+    description: 'Absolute path of the SARIF report, or empty.'
+
+runs:
+  using: 'node24'
+  main: 'src/index.js'

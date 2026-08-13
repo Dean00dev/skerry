@@ -1,0 +1,32 @@
+{
+  "name": "skerry",
+  "version": "1.0.0",
+  "description": "Fail the build when a filename cannot be checked out safely on Windows or macOS.",
+  "license": "MIT",
+  "author": "Dean Egan",
+  "private": true,
+  "type": "commonjs",
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node scripts/test.js",
+    "check": "node scripts/check-metadata.js && node scripts/scan-secrets.js",
+    "verify": "npm run test && npm run check",
+    "self": "node src/index.js --fail-on warning"
+  },
+  "keywords": [
+    "github-action",
+    "filenames",
+    "cross-platform",
+    "windows",
+    "macos",
+    "unicode",
+    "repository-hygiene"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dean00dev/skerry.git"
+  }
+}

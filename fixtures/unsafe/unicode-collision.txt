@@ -1,0 +1,4 @@
+# Same name, two Unicode spellings. macOS sees one file.
+docs/café.md
+docs/café.md
+standalone/exposéd-only.md

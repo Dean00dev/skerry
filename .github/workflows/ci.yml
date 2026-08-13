@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Tests (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: ['20', '22', '24']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Run the test suite
+        run: npm test
+
+  metadata:
+    name: Metadata and secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Check every source file parses
+        run: |
+          for f in src/*.js scripts/*.js test/*.js; do
+            node --check "$f"
+          done
+
+      - name: Parse action.yml and the workflows with a real YAML parser
+        run: |
+          python3 -m pip install --quiet --disable-pip-version-check 'pyyaml==6.0.3'
+          python3 - <<'PY'
+          import sys, glob, yaml
+          files = ['action.yml'] + sorted(glob.glob('.github/workflows/*.yml'))
+          for f in files:
+              with open(f, encoding='utf-8') as fh:
+                  yaml.safe_load(fh)
+              print(f'ok {f}')
+          PY
+
+      - name: Metadata consistency
+        run: node scripts/check-metadata.js
+
+      - name: Credential scan
+        run: node scripts/scan-secrets.js
+
+  self-clean:
+    name: Skerry passes its own strictest setting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run the Action on its own repository
+        uses: ./
+        with:
+          fail-on: warning
+          report-json: skerry-self-report.json
+
+  self-catches:
+    name: Skerry fails when it should
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run the Action against a hazardous manifest
+        id: hazard
+        continue-on-error: true
+        uses: ./
+        with:
+          source: list
+          paths-file: fixtures/unsafe/case-collision.txt
+          summary: false
+
+      - name: A green result here would mean the Action is broken
+        env:
+          OUTCOME: ${{ steps.hazard.outcome }}
+          ERRORS: ${{ steps.hazard.outputs.errors }}
+          PASSED: ${{ steps.hazard.outputs.passed }}
+        run: |
+          echo "outcome=$OUTCOME errors=$ERRORS passed=$PASSED"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "::error::Skerry did not fail on a known hazardous manifest"
+            exit 1
+          fi
+          if [ "$PASSED" != "false" ] || [ "$ERRORS" != "6" ]; then
+            echo "::error::Skerry failed, but not with the expected outputs"
+            exit 1
+          fi
+
+  self-outputs:
+    name: Step outputs are usable downstream
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Scan without gating the build
+        id: scan
+        uses: ./
+        with:
+          fail-on: never
+          summary: false
+
+      - name: Read the outputs back
+        env:
+          FINDINGS: ${{ steps.scan.outputs.findings }}
+          SCANNED: ${{ steps.scan.outputs.scanned }}
+          SOURCE: ${{ steps.scan.outputs.source }}
+        run: |
+          echo "findings=$FINDINGS scanned=$SCANNED source=$SOURCE"
+          if [ "$SOURCE" != "git" ]; then
+            echo "::error::expected the git source inside a checkout"
+            exit 1
+          fi
+          if [ "$SCANNED" -lt 20 ]; then
+            echo "::error::implausibly few paths scanned"
+            exit 1
+          fi

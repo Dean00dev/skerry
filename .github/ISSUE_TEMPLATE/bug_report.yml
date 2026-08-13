@@ -1,0 +1,40 @@
+name: Bug report
+description: Something behaved differently from the documentation
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not paste a real hazardous filename into this form if it
+        would break your own clipboard or terminal. A manifest line is enough.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: paths
+    attributes:
+      label: Paths that reproduce it
+      description: One path per line, exactly as stored in git.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what happened instead
+    validations:
+      required: true
+  - type: textarea
+    id: workflow
+    attributes:
+      label: The step as configured
+      render: yaml
+  - type: input
+    id: runner
+    attributes:
+      label: Runner and Node version
+      placeholder: ubuntu-latest, Node 24

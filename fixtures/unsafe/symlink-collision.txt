@@ -1,0 +1,3 @@
+# A symlink taking part in a case collision.
+120000	docs/Link
+100644	docs/link

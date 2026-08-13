@@ -1,0 +1,6 @@
+# Characters that hide or reorder the name shown in review.
+reports/invoice‮gnp.exe
+src/⁦isolate⁩.js
+data/zero​width.csv
+docs/soft­hyphen.md
+assets/family-👨‍👩‍👧.png

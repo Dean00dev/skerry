@@ -1,0 +1,168 @@
+{
+  "tool": "Skerry",
+  "version": "1.0.0",
+  "receipt_schema": "skerry-verification/1",
+  "verified_on": "2026-08-13",
+  "environment": {
+    "node": "v24.14.0",
+    "git": "2.51.1",
+    "os": "Linux x86_64",
+    "network": "enabled for primary-documentation checks only"
+  },
+  "published_to_github": false,
+  "gates": [
+    {
+      "name": "test suite",
+      "command": "npm test",
+      "result": "pass",
+      "tests_total": 169,
+      "tests_passed": 169,
+      "tests_failed": 0,
+      "tests_skipped": 0
+    },
+    {
+      "name": "metadata consistency",
+      "command": "node scripts/check-metadata.js",
+      "result": "pass",
+      "notes": 0
+    },
+    {
+      "name": "credential scan",
+      "command": "node scripts/scan-secrets.js",
+      "result": "clean",
+      "files_scanned": 55,
+      "patterns": 9,
+      "hits": 0
+    },
+    {
+      "name": "javascript syntax",
+      "command": "node --check",
+      "result": "pass",
+      "files": 22
+    },
+    {
+      "name": "yaml parse",
+      "command": "python yaml.safe_load",
+      "result": "pass",
+      "files": 5
+    },
+    {
+      "name": "self scan strictest",
+      "command": "node src/index.js --fail-on warning",
+      "result": "pass",
+      "paths": 55,
+      "findings": 0,
+      "exit_code": 0
+    },
+    {
+      "name": "self scan via git source",
+      "command": "real git checkout of this repo",
+      "result": "pass",
+      "paths": 51,
+      "findings": 0,
+      "source": "git"
+    }
+  ],
+  "status": {
+    "implemented": [
+      "11 rules SK001-SK011",
+      "3 path sources",
+      "annotations",
+      "job summary",
+      "JSON report",
+      "SARIF report",
+      "10 step outputs",
+      "ignore patterns",
+      "per-rule disable",
+      "fail-on threshold",
+      "exit codes 0/1/2/3"
+    ],
+    "tested": [
+      "all 11 rules positive and negative",
+      "collision classification",
+      "boundary values",
+      "input validation",
+      "workflow command injection resistance",
+      "ANSI and bidi log spoofing resistance",
+      "summary table injection resistance",
+      "subprocess argument safety",
+      "symlink loop termination",
+      "pattern matcher performance",
+      "output truncation",
+      "determinism byte-identical",
+      "no secret or env disclosure",
+      "end-to-end via child process",
+      "real git repo with real hazardous filenames"
+    ],
+    "simulated": [
+      "runner environment variables",
+      "$GITHUB_OUTPUT round trip",
+      "$GITHUB_STEP_SUMMARY write",
+      "annotation string emission"
+    ],
+    "not_demonstrated": [
+      "execution on a GitHub runner",
+      "the CI workflow itself",
+      "GitHub's embedded Node 24 Action runtime",
+      "Windows",
+      "macOS",
+      "Marketplace acceptance",
+      "name availability",
+      "unaffiliated human review",
+      "false positive rate in the wild",
+      "performance near the documented caps",
+      "SARIF schema validation"
+    ],
+    "owner_required": [
+      "create public repo named skerry with no README/licence/gitignore",
+      "upload archive with action.yml at root",
+      "enable Issues and private vulnerability reporting",
+      "confirm CI green",
+      "accept Marketplace Developer Agreement",
+      "draft release v1.0.0 and publish",
+      "create moving v1 tag",
+      "test from a second repository"
+    ]
+  },
+  "defects_found_and_fixed": [
+    "SK002 printed visually identical paths; added code point spelling",
+    "a test asserted NUL:x.txt triggers SK004; corrected to SK005 semantics",
+    "node --test directory form broken on Node 22; replaced with scripts/test.js",
+    "SK004 falsely included COM0 and LPT0; aligned it with Microsoft's COM1-COM9 and LPT1-LPT9 list",
+    "entry and depth caps could silently return partial green scans; all sources now fail closed",
+    "filesystem directory and manifest allocation could precede cap enforcement; entries now stream and manifests are size-checked",
+    "auto source could hide git collection failure with a filesystem fallback; detected work trees now fail closed",
+    "names-only wording ignored that source list reads a manifest; clarified the trust boundary",
+    "CI action majors were stale and PyYAML floated; updated action majors and pinned PyYAML 6.0.3"
+  ],
+  "dependencies": {
+    "runtime": 0,
+    "build": 0,
+    "bundled_dist": false
+  },
+  "production_ready_claim": false,
+  "file_count": 55,
+  "inventory": {
+    "source_modules": 8,
+    "source_lines": 1555,
+    "test_files": 11,
+    "test_lines": 1476,
+    "script_files": 3,
+    "fixture_manifests": 9,
+    "yaml_files": 5
+  },
+  "integration_review": {
+    "reviewer": "ChatGPT / Super Sol (OpenAI)",
+    "baseline_reproduced_before_changes": {
+      "tests_passed": 160,
+      "tests_failed": 0
+    },
+    "primary_sources_checked": [
+      "GitHub Actions metadata syntax",
+      "Microsoft Naming Files, Paths, and Namespaces",
+      "official actions/checkout releases",
+      "official actions/setup-node releases",
+      "PyPI PyYAML release metadata"
+    ]
+  }
+}

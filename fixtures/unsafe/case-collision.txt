@@ -1,0 +1,7 @@
+# Case collisions: file level, directory level, and root level.
+src/instruments/Keysight/__init__.py
+src/instruments/keysight/__init__.py
+docs/README.md
+docs/readme.md
+Makefile
+makefile

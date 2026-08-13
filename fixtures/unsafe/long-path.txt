@@ -1,0 +1,2 @@
+deeply/nested/project/structure/that/keeps/going/and/going/well/past/anything/reasonable/for/a/single/repository/path/because/someone/generated/it/automatically/from/a/schema/definition/file/output.json
+short/ok.txt

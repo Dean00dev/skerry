@@ -1,0 +1,16 @@
+# A perfectly ordinary repository. Skerry should find nothing here.
+README.md
+LICENSE
+.gitignore
+src/index.js
+src/lib/parser.js
+src/lib/parser.test.js
+docs/getting-started.md
+docs/images/diagram.svg
+assets/logo-256.png
+tests/fixtures/sample-input.json
+.github/workflows/ci.yml
+translations/fr/messages.po
+translations/ja/messages.po
+emoji/family-👨‍👩‍👧.png
+accented/café-menu.md
