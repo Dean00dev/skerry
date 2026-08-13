@@ -86,21 +86,6 @@ function writeManifest(contents) {
   return file;
 }
 
-/** Some hazardous names cannot exist on the host filesystem. Probe first. */
-function canCreateHazardousNames() {
-  const dir = tempDir('probe');
-  try {
-    fs.writeFileSync(path.join(dir, 'nul'), 'x');
-    fs.writeFileSync(path.join(dir, 'a:b.txt'), 'x');
-    fs.writeFileSync(path.join(dir, 'trailing.'), 'x');
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-const HAZARDOUS_OK = canCreateHazardousNames();
-
 function gitInstalled() {
   try {
     execFileSync('git', ['--version'], { stdio: 'ignore' });
@@ -207,7 +192,10 @@ test('JSON and SARIF reports are written where asked', () => {
   const sarif = JSON.parse(fs.readFileSync(path.join(dir, 'out', 'report.sarif'), 'utf8'));
   assert.equal(json.counts.error, 2);
   assert.equal(sarif.version, '2.1.0');
-  assert.ok(r.outputs['report-json-path'].endsWith('out/report.json'));
+  assert.equal(
+    path.normalize(r.outputs['report-json-path']),
+    path.resolve(dir, 'out', 'report.json')
+  );
 });
 
 test('two identical runs produce byte identical JSON reports', () => {
@@ -250,8 +238,8 @@ test('the log never prints an environment secret', () => {
 });
 
 test(
-  'a real git repository with real hazardous files is caught',
-  { skip: !HAZARDOUS_OK || !gitInstalled() ? 'host filesystem cannot represent these names' : false },
+  'a real git repository with a portable hazardous file is caught',
+  { skip: !gitInstalled() },
   () => {
     const dir = tempDir('realgit');
     const run = (args) => execFileSync('git', args, { cwd: dir, stdio: 'ignore' });
@@ -259,22 +247,19 @@ test(
     run(['config', 'user.email', 'test@example.invalid']);
     run(['config', 'user.name', 'Skerry Test']);
 
-    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'src', 'config.json'), '{}');
-    fs.writeFileSync(path.join(dir, 'src', 'Config.json'), '{}');
-    fs.writeFileSync(path.join(dir, 'nul'), 'x');
-    fs.writeFileSync(path.join(dir, 'report:2026.csv'), 'x');
-    fs.writeFileSync(path.join(dir, 'untracked-and-bad:name.txt'), 'x');
-    run(['add', 'src/config.json', 'src/Config.json', 'nul', 'report:2026.csv']);
+    // U+202E is representable on Linux, macOS and Windows, but can visually
+    // reorder the suffix. Platform-illegal names are covered through source:list.
+    const deceptive = 'invoice-\u202Etxt.js';
+    fs.writeFileSync(path.join(dir, deceptive), 'x');
+    fs.writeFileSync(path.join(dir, 'untracked-\u202Etxt.js'), 'x');
+    run(['add', deceptive]);
 
-    const r = runAction({}, { workspace: dir });
+    const r = runAction({ 'fail-on': 'warning' }, { workspace: dir });
     assert.equal(r.status, 1);
     assert.equal(r.outputs.source, 'git');
-    assert.ok(r.stdout.includes('SK001'));
-    assert.ok(r.stdout.includes('SK004'));
-    assert.ok(r.stdout.includes('SK005'));
+    assert.ok(r.stdout.includes('SK009'));
     assert.ok(
-      !r.stdout.includes('untracked-and-bad'),
+      !r.stdout.includes('untracked-'),
       'the git source must only see tracked paths'
     );
   }
