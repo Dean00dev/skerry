@@ -155,8 +155,11 @@ function run(argv) {
   out(headline);
 
   if (failing) {
+    // This explains the failing result; it is not another finding. Emitting
+    // it as an error made GitHub's annotation total exceed the `errors`
+    // output by one. The exit code below still fails the step.
     out(
-      `::error title=Skerry::Path hazards found. See the annotations above, or run this Action with fail-on: warning|never to change the threshold.`
+      '::notice title=Skerry::Path hazards found. See the annotations above, or run this Action with fail-on: warning|never to change the threshold.'
     );
     return EXIT.FINDINGS;
   }

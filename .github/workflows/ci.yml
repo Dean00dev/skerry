@@ -84,6 +84,9 @@ jobs:
           source: list
           paths-file: fixtures/unsafe/case-collision.txt
           summary: false
+          # This job fails on purpose. Suppress its intentional findings so
+          # they are not attached to otherwise healthy commits.
+          annotations: false
 
       - name: A green result here would mean the Action is broken
         env:

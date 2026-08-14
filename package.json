@@ -1,6 +1,6 @@
 {
   "name": "skerry",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fail the build when a filename cannot be checked out safely on Windows or macOS.",
   "license": "MIT",
   "author": "Dean Egan",

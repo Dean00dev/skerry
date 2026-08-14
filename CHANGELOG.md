@@ -7,7 +7,23 @@ All notable changes to this project are documented here. The format follows
 New rules change results for existing users, so they ship only in major
 versions. Pinning to `@v1` freezes the rule set.
 
-## [1.0.0] — unreleased
+## [1.0.1] — unreleased
+
+### Fixed
+
+- The explanatory “Path hazards found” workflow command is now a notice rather
+  than an additional error, so GitHub's error annotation total reconciles with
+  Skerry's `errors` output.
+- The deliberately hazardous CI self-test now suppresses annotations, avoiding
+  intentional findings being permanently attached to otherwise healthy
+  commits. Its exit status and outputs remain asserted downstream.
+
+### Verification
+
+- Added six regression tests covering annotation-count reconciliation, failure
+  semantics and the negative CI job's annotation boundary.
+
+## [1.0.0] — 2026-08-13
 
 First public release.
 
@@ -38,4 +54,5 @@ First public release.
 - Resource caps on tree depth, entry count, pattern count, pattern length and
   findings output.
 
+[1.0.1]: https://github.com/Dean00dev/skerry/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Dean00dev/skerry/releases/tag/v1.0.0

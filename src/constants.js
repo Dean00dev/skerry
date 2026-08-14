@@ -7,7 +7,7 @@
  * never reused or renumbered. New rules are added at the end.
  */
 
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 const TOOL_NAME = 'Skerry';
 const REPORT_SCHEMA = 'skerry-report/1';
 
