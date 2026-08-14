@@ -36,25 +36,23 @@ publishes, pushes, or registers anything by itself.
 
 ## Publishing to Marketplace
 
-- [ ] Accept the GitHub Marketplace Developer Agreement if prompted
-- [ ] Open `action.yml` in the repository; a banner offers **Draft a release**
-- [ ] Tick **Publish this Action to the GitHub Marketplace**
-- [ ] Resolve any name conflict using the fallback list in `MARKETPLACE.md`,
-      and update `name:` in `action.yml` to match whatever is accepted
+- [ ] Open the repository's Releases page and choose **Draft a new release**
+- [ ] Confirm **Publish this Action to the GitHub Marketplace** remains selected
+- [ ] Confirm the accepted Marketplace name remains **Skerry Path Guard**
 - [ ] Primary category: **Code quality**. Secondary: **Utilities**
-- [ ] Tag: `v1.0.0`
+- [ ] Tag: `v1.0.1`
 - [ ] Release title and notes: copy from `MARKETPLACE.md`
 - [ ] Publish
 
 ## Immediately after
 
 - [ ] Create the moving major tag so `@v1` resolves:
-      `git tag -f v1 v1.0.0 && git push -f origin v1`
+      `git tag -f v1 v1.0.1 && git push -f origin v1`
 - [ ] Open the Marketplace listing and confirm the description and icon render
 - [ ] Test the published Action from a **different** repository, pinned to
       `@v1`, and confirm it runs. Until this is done, "works as a published
       Action" is untested
-- [ ] Update `CHANGELOG.md` to move `1.0.0` from unreleased to the release date
+- [ ] Update `CHANGELOG.md` to move `1.0.1` from unreleased to the release date
 
 ## For each later release
 

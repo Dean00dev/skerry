@@ -1,19 +1,27 @@
 {
   "tool": "Skerry",
-  "version": "1.0.0",
-  "receipt_schema": "skerry-verification/1",
-  "verified_on": "2026-08-13",
+  "version": "1.0.1",
+  "receipt_schema": "skerry-verification/2",
+  "verified_on": "2026-08-14",
   "environment": {
     "node": "v24.14.0",
     "git": "2.51.1",
     "os": "Linux x86_64",
-    "network": "enabled for primary-documentation checks only"
+    "network": "enabled for GitHub API evidence"
   },
   "published_to_github": true,
   "github": {
     "repository": "https://github.com/Dean00dev/skerry",
-    "verified_commit": "0001629384b75697039504117903478b88daab59",
-    "successful_run": "https://github.com/Dean00dev/skerry/actions/runs/31697656821",
+    "verified_code_commit": "1c42c76e193893cc123be664fa1aa59bb0db213b",
+    "successful_run": "https://github.com/Dean00dev/skerry/actions/runs/31818840110",
+    "run_number": 7,
+    "jobs_passed": 13,
+    "jobs_failed": 0,
+    "intentional_failure_check_run": 94826964220,
+    "intentional_failure_annotations": 0,
+    "marketplace_listing": "https://github.com/marketplace/actions/skerry-path-guard",
+    "published_release": "v1.0.0",
+    "candidate_release": "v1.0.1",
     "runner_matrix": [
       "ubuntu-latest / Node 20",
       "ubuntu-latest / Node 22",
@@ -24,6 +32,9 @@
       "windows-latest / Node 20",
       "windows-latest / Node 22",
       "windows-latest / Node 24"
+    ],
+    "action_execution_os": [
+      "ubuntu-latest"
     ]
   },
   "gates": [
@@ -31,8 +42,8 @@
       "name": "test suite",
       "command": "npm test",
       "result": "pass",
-      "tests_total": 169,
-      "tests_passed": 169,
+      "tests_total": 176,
+      "tests_passed": 176,
       "tests_failed": 0,
       "tests_skipped": 0
     },
@@ -46,7 +57,7 @@
       "name": "credential scan",
       "command": "node scripts/scan-secrets.js",
       "result": "clean",
-      "files_scanned": 55,
+      "files_scanned": 56,
       "patterns": 9,
       "hits": 0
     },
@@ -54,7 +65,7 @@
       "name": "javascript syntax",
       "command": "node --check",
       "result": "pass",
-      "files": 22
+      "files": 23
     },
     {
       "name": "yaml parse",
@@ -66,17 +77,9 @@
       "name": "self scan strictest",
       "command": "node src/index.js --fail-on warning",
       "result": "pass",
-      "paths": 55,
+      "paths": 56,
       "findings": 0,
       "exit_code": 0
-    },
-    {
-      "name": "self scan via git source",
-      "command": "live GitHub Action on its own checkout",
-      "result": "pass",
-      "paths": 55,
-      "findings": 0,
-      "source": "git"
     },
     {
       "name": "github runner matrix",
@@ -86,20 +89,32 @@
       "jobs_failed": 0
     },
     {
+      "name": "live action clean",
+      "command": "Action on its own checkout",
+      "result": "pass",
+      "paths": 56,
+      "findings": 0,
+      "source": "git",
+      "os": "ubuntu-latest"
+    },
+    {
       "name": "live action catches hazards",
-      "command": "Action against hazardous manifest",
+      "command": "Action against hazardous manifest with annotations false",
       "result": "pass",
       "expected_action_outcome": "failure",
       "errors": 6,
-      "passed_output": false
+      "passed_output": false,
+      "check_run_annotations": 0,
+      "os": "ubuntu-latest"
     },
     {
       "name": "live action outputs",
       "command": "consume step outputs downstream",
       "result": "pass",
       "findings": 0,
-      "paths": 55,
-      "source": "git"
+      "paths": 56,
+      "source": "git",
+      "os": "ubuntu-latest"
     }
   ],
   "status": {
@@ -122,6 +137,8 @@
       "boundary values",
       "input validation",
       "workflow command injection resistance",
+      "annotation total reconciliation",
+      "annotations false emits no workflow commands while preserving failure",
       "ANSI and bidi log spoofing resistance",
       "summary table injection resistance",
       "subprocess argument safety",
@@ -129,49 +146,101 @@
       "pattern matcher performance",
       "output truncation",
       "determinism byte-identical",
-      "no secret or env disclosure",
+      "no secret or environment disclosure",
       "end-to-end via child process",
-      "real git repo with a portable hazardous filename",
-      "GitHub Actions on Ubuntu, macOS and Windows",
+      "real git repository with a portable hazardous filename",
+      "test suite on Ubuntu, macOS and Windows",
       "Node 20, 22 and 24",
-      "live clean and failing Action invocations",
-      "live downstream step outputs"
+      "live clean and failing Action invocations on Ubuntu",
+      "live downstream step outputs",
+      "live check-run annotation count"
     ],
     "simulated": [
-      "runner environment variables",
-      "$GITHUB_OUTPUT round trip",
-      "$GITHUB_STEP_SUMMARY write",
-      "annotation string emission"
+      "runner environment variables in local end-to-end tests",
+      "$GITHUB_OUTPUT local round trip",
+      "$GITHUB_STEP_SUMMARY local write"
     ],
     "not_demonstrated": [
-      "Marketplace acceptance",
-      "name availability",
+      "published Action execution on macOS or Windows",
+      "workflow reference from an unrelated repository",
       "pull-request diff annotation rendering",
       "unaffiliated human review",
-      "false positive rate in the wild",
+      "false-positive rate in the wild",
       "performance near the documented caps",
       "SARIF schema validation"
     ],
     "owner_required": [
-      "enable Issues and private vulnerability reporting",
-      "accept Marketplace Developer Agreement",
-      "draft release v1.0.0 and publish",
-      "create moving v1 tag",
-      "test from a second repository"
+      "publish release v1.0.1",
+      "move the major v1 tag to v1.0.1",
+      "test the published Action from a different repository and operating system"
     ]
   },
+  "live_run_history": [
+    {
+      "run": 1,
+      "id": 31697119844,
+      "commit": "6fe12d63",
+      "result": "failure",
+      "finding": "non-portable fixtures and Windows Node 20 junction classification"
+    },
+    {
+      "run": 2,
+      "id": 31697438421,
+      "commit": "30016074",
+      "result": "failure",
+      "finding": "macOS realpath alias and Windows Node 20 junction issue remained"
+    },
+    {
+      "run": 3,
+      "id": 31697656821,
+      "commit": "00016293",
+      "result": "success",
+      "finding": "all 13 expanded jobs passed"
+    },
+    {
+      "run": 4,
+      "id": 31698018134,
+      "commit": "90f99574",
+      "result": "success",
+      "finding": "seven GitHub errors were displayed for six Skerry findings"
+    },
+    {
+      "run": 5,
+      "id": 31698958965,
+      "commit": "24167520",
+      "result": "success",
+      "finding": "Marketplace display-name change preserved all gates"
+    },
+    {
+      "run": 6,
+      "id": 31818584046,
+      "commit": "6f17b001",
+      "result": "success",
+      "finding": "initial repair left one notice annotation on the intentional failure job"
+    },
+    {
+      "run": 7,
+      "id": 31818840110,
+      "commit": "1c42c76e",
+      "result": "success",
+      "finding": "13 of 13 jobs passed and the intentional failure check run had zero annotations"
+    }
+  ],
   "defects_found_and_fixed": [
     "SK002 printed visually identical paths; added code point spelling",
     "a test asserted NUL:x.txt triggers SK004; corrected to SK005 semantics",
-    "node --test directory form broken on Node 22; replaced with scripts/test.js",
-    "SK004 falsely included COM0 and LPT0; aligned it with Microsoft's COM1-COM9 and LPT1-LPT9 list",
+    "node --test directory form broke on Node 22; replaced with scripts/test.js",
+    "SK004 falsely included COM0 and LPT0; aligned with COM1-COM9 and LPT1-LPT9",
     "entry and depth caps could silently return partial green scans; all sources now fail closed",
-    "filesystem directory and manifest allocation could precede cap enforcement; entries now stream and manifests are size-checked",
+    "filesystem directory and manifest allocation could precede cap enforcement; entries now stream and manifests are size checked",
     "auto source could hide git collection failure with a filesystem fallback; detected work trees now fail closed",
     "names-only wording ignored that source list reads a manifest; clarified the trust boundary",
     "CI action majors were stale and PyYAML floated; updated action majors and pinned PyYAML 6.0.3",
-    "live CI exposed Linux-specific path and filename assumptions in tests; made the fixtures portable and compared filesystem identity",
-    "Node 20 on Windows could classify a directory symlink as a directory; filesystem traversal now uses lstat and never follows it"
+    "live CI exposed Linux-specific path and filename assumptions; fixtures are portable and report paths use filesystem identity",
+    "Node 20 on Windows could classify a directory symlink as a directory; traversal now uses lstat and never follows it",
+    "an explanatory failure line was emitted as an additional error; it is now a notice",
+    "the deliberate negative CI job attached expected errors to commits; annotations are disabled for that job",
+    "the initial repair still emitted one notice when annotations were disabled; all workflow annotation commands now honor the input"
   ],
   "dependencies": {
     "runtime": 0,
@@ -179,14 +248,14 @@
     "bundled_dist": false
   },
   "production_ready_claim": false,
-  "file_count": 55,
+  "file_count": 56,
   "inventory": {
     "source_modules": 8,
-    "source_lines": 1566,
-    "test_files": 11,
-    "test_lines": 1461,
+    "source_lines": 1571,
+    "test_files": 12,
+    "test_lines": 1614,
     "script_files": 3,
-    "fixture_manifests": 9,
+    "hazardous_fixture_manifests": 9,
     "yaml_files": 5
   },
   "integration_review": {
@@ -195,12 +264,14 @@
       "tests_passed": 160,
       "tests_failed": 0
     },
-    "primary_sources_checked": [
-      "GitHub Actions metadata syntax",
-      "Microsoft Naming Files, Paths, and Namespaces",
-      "official actions/checkout releases",
-      "official actions/setup-node releases",
-      "PyPI PyYAML release metadata"
-    ]
+    "tests_after_initial_integration": {
+      "tests_passed": 169,
+      "tests_failed": 0
+    },
+    "tests_after_annotation_repairs": {
+      "tests_passed": 176,
+      "tests_failed": 0
+    },
+    "patch_source": "Claude (Anthropic) supplied the initial two-patch review bundle; Super Sol independently reviewed, integrated and completed the live-boundary repair"
   }
 }

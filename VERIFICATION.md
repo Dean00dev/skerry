@@ -1,18 +1,20 @@
 # Verification receipt
 
-**Skerry 1.0.0** · original Claude verification plus independent integration
-review on 13 August 2026
+**Skerry 1.0.1** · original Claude verification, independent integration
+review, and live annotation-integrity repair through 14 August 2026
 
 This document exists so that nothing in this repository has to be taken on
 trust. It separates what was actually executed from what was simulated and what
 has not been demonstrated at all.
 
-Skerry is now public on GitHub and has run successfully in GitHub Actions on
-Ubuntu, macOS and Windows with Node 20, 22 and 24. It has **not** been released
-or listed on Marketplace. Claude's baseline was produced locally on Node
+Skerry is public on GitHub. Version 1.0.0 was released and accepted into the
+[GitHub Marketplace](https://github.com/marketplace/actions/skerry-path-guard).
+The 1.0.1 candidate has run successfully in GitHub Actions on Ubuntu, macOS and
+Windows with Node 20, 22 and 24. Claude's baseline was produced locally on Node
 22.22.2 with network disabled. ChatGPT / Super Sol independently reproduced the
-baseline, reviewed the implementation, and integrated it on GitHub. The final
-local state passed on Node 24.14.0, Linux x86_64, git 2.51.1.
+baseline, reviewed the implementation, integrated it on GitHub, and verified
+the 1.0.1 repairs against GitHub's check-run API. The final local state passed
+on Node 24.14.0, Linux x86_64, git 2.51.1.
 
 ---
 
@@ -22,19 +24,20 @@ Every gate was executed in one sequence on the final state of the repository.
 
 | Gate | Command | Result |
 | --- | --- | --- |
-| Test suite | `npm test` | **169 passed, 0 failed, 0 skipped** |
+| Test suite | `npm test` | **176 passed, 0 failed, 0 skipped** |
 | Metadata consistency | `node scripts/check-metadata.js` | passed, 0 notes |
-| Credential scan | `node scripts/scan-secrets.js` | clean — 55 text files, 9 patterns |
-| JavaScript syntax | `node --check` on all 22 `.js` files | all parse |
+| Credential scan | `node scripts/scan-secrets.js` | clean — 56 text files, 9 patterns |
+| JavaScript syntax | `node --check` on all 23 `.js` files | all parse |
 | YAML parse | Python `yaml.safe_load` on 5 files | all parse |
-| Self scan, strictest | `node src/index.js --fail-on warning` | 55 paths, 0 findings, exit 0 |
+| Self scan, strictest | `node src/index.js --fail-on warning` | 56 paths, 0 findings, exit 0 |
 | GitHub matrix | Ubuntu, macOS, Windows × Node 20, 22, 24 | **9/9 passed** |
-| Live Action: clean | Skerry on its own checkout | 55 tracked paths, 0 findings |
+| Live Action: clean | Skerry on its own checkout | 56 tracked paths, 0 findings |
 | Live Action: catches | Skerry on hazardous manifest | 6 errors, expected failure observed |
-| Live step outputs | Action outputs consumed downstream | `findings=0`, `scanned=55`, `source=git` |
+| Live intentional-failure annotations | GitHub check-run annotations API | **0 annotations** |
+| Live step outputs | Action outputs consumed downstream | `findings=0`, `scanned=56`, `source=git` |
 
-Repository inventory: 55 files, 1,566 lines of source across 8 modules, 1,461
-lines of test across 11 files, 9 hazardous fixture manifests, **0 runtime
+Repository inventory: 56 files, 1,571 lines of source across 8 modules, 1,614
+lines of test across 12 files, 9 hazardous fixture manifests, **0 runtime
 dependencies**, no `dist/`, no `node_modules/`.
 
 ---
@@ -107,8 +110,9 @@ Confirmed by reading real files from disk:
   and still reports `errors=30`
 - Usage errors exit 2 and write **no** step outputs at all
 - JSON and SARIF reports are written to the requested paths and parse
-- `ignore` patterns are honoured; `annotations: false` switches to plain text;
-  `summary: false` leaves the summary file untouched
+- `ignore` patterns are honoured; `annotations: false` emits no workflow
+  annotation commands while preserving the failure exit code; `summary: false`
+  leaves the summary file untouched
 - Every emitted annotation matches `^::(error|warning|notice) [^:]*::`
 
 **A real git repository was created and scanned.** A tracked filename containing
@@ -119,30 +123,46 @@ names and case collisions remain manifest fixtures because those paths cannot
 be represented on every runner filesystem.
 
 **Skerry scanned its own repository as a real GitHub checkout.** The live Action
-read 55 tracked paths via the git source and found nothing at `fail-on: warning`.
+read 56 tracked paths via the git source and found nothing at `fail-on: warning`.
 A downstream step read the real outputs and confirmed `source=git`,
-`scanned=55`, `findings=0`.
+`scanned=56`, `findings=0`.
 
 ---
 
 ## 4 · Live GitHub execution
 
 GitHub Actions run
-[`31697656821`](https://github.com/Dean00dev/skerry/actions/runs/31697656821)
-completed successfully at commit `0001629384b75697039504117903478b88daab59`.
+[`31818840110`](https://github.com/Dean00dev/skerry/actions/runs/31818840110)
+completed successfully at commit `1c42c76e193893cc123be664fa1aa59bb0db213b`.
 
 | Live evidence | Result |
 | --- | --- |
 | Unit/end-to-end matrix | Ubuntu, macOS and Windows on Node 20, 22 and 24 all passed |
 | Metadata and secrets | JavaScript syntax, YAML parsing, metadata and credential scan passed |
-| Real Action, clean checkout | 55 tracked paths, 0 findings, strictest setting passed |
+| Real Action, clean checkout | 56 tracked paths, 0 findings, strictest setting passed |
 | Real Action, hazardous manifest | 6 errors found; the expected failing outcome was asserted |
-| Real Action outputs | A downstream step read `findings=0`, `scanned=55`, `source=git` |
+| Intentional-failure annotation hygiene | Check run `94826964220` returned an empty annotations array |
+| Real Action outputs | A downstream step read `findings=0`, `scanned=56`, `source=git` |
 
 The local runner simulation remains useful because it directly reads the
 output and summary files and attacks their escaping. The live jobs now also
 establish that GitHub accepts `action.yml`, invokes the Node 24 entrypoint,
 recognises failure, and exposes step outputs to later steps.
+
+### Disclosed live-run history
+
+Failures are retained because repaired evidence is stronger when its history is
+visible.
+
+| Run | Commit | Outcome | What it established |
+| --- | --- | --- | --- |
+| [#1](https://github.com/Dean00dev/skerry/actions/runs/31697119844) | `6fe12d63` | failed | Linux-specific separators, host-illegal fixtures and a Windows Node 20 junction classification were exposed |
+| [#2](https://github.com/Dean00dev/skerry/actions/runs/31697438421) | `30016074` | failed | `/var` versus `/private/var` on macOS and the Windows Node 20 junction case remained |
+| [#3](https://github.com/Dean00dev/skerry/actions/runs/31697656821) | `00016293` | passed | All nine OS/Node test cells and four integration jobs passed after the production fix |
+| [#4](https://github.com/Dean00dev/skerry/actions/runs/31698018134) | `90f99574` | passed | Live UI exposed seven error annotations for six findings in the intentional failure job |
+| [#5](https://github.com/Dean00dev/skerry/actions/runs/31698958965) | `24167520` | passed | Unique Marketplace display-name change preserved all gates |
+| [#6](https://github.com/Dean00dev/skerry/actions/runs/31818584046) | `6f17b001` | passed | Six false errors disappeared, but API inspection found one residual notice annotation |
+| [#7](https://github.com/Dean00dev/skerry/actions/runs/31818840110) | `1c42c76e` | passed | **13/13 jobs passed and the intentional failure job returned zero annotations** |
 
 ---
 
@@ -150,10 +170,12 @@ recognises failure, and exposes step outputs to later steps.
 
 Honest gaps. None is hidden.
 
-- **Marketplace eligibility is unconfirmed.** The requirements are met as
-  documented — public repository, single `action.yml` at the root, unique name,
-  branding present — but GitHub's acceptance, and whether the name `Skerry` is
-  free, can only be established at the draft release form.
+- **Marketplace acceptance is demonstrated; external use is not.** GitHub lists
+  Skerry Path Guard and release 1.0.0 publicly. This receipt has not found a
+  workflow in an unrelated repository invoking the published Action.
+- **Cross-platform Action execution is only partially demonstrated.** The full
+  test suite passes on Ubuntu, macOS and Windows, but the three live `uses: ./`
+  integration jobs execute on Ubuntu only.
 - **Independent review happened, but not human code review.** ChatGPT / Super
   Sol read and adversarially tested the code. No unaffiliated human has reviewed
   it.
@@ -161,7 +183,7 @@ Honest gaps. None is hidden.
   against a repository it did not create. SK003 in particular is expected to be
   noisy and is a warning for that reason, but that expectation is untested at
   scale.
-- **Performance at scale is untested.** The largest scan was 55 paths. Caps at
+- **Performance at scale is untested.** The largest live self-scan was 56 paths. Caps at
   500,000 entries and 100 levels of depth are implemented and bounded but were
   not exercised near their limits.
 - **SARIF was structurally checked, not schema validated.** Version, rule
@@ -174,10 +196,9 @@ Honest gaps. None is hidden.
 Nothing in this project can do any of these, and nothing attempted to.
 
 1. Enable Issues and Private vulnerability reporting if not already enabled
-2. Accept the Marketplace Developer Agreement
-3. Draft the release, resolve any name conflict, choose the categories
-4. Create the moving `v1` tag after release
-5. Test the published Action from a different repository
+2. Publish the reviewed 1.0.1 release
+3. Move the major `v1` tag to the reviewed 1.0.1 commit
+4. Test the published Action from a different repository and operating system
 
 Full sequence in `RELEASE_CHECKLIST.md`.
 
@@ -239,23 +260,35 @@ any modification. The integration review then made these disclosed changes:
     filesystem walker now checks every entry with `lstat`, records symlinks, and
     never follows them. This was a production hardening fix, not merely a test
     adjustment.
+12. **Finding totals did not reconcile with GitHub's annotation panel.** Six
+    SK001 findings produced seven errors because the explanatory failure line
+    was emitted as another `::error`. It is now a notice, so explanatory text is
+    not counted as a finding.
+13. **The intentional negative CI test attached its six expected errors to the
+    commit.** That job now runs with `annotations: false`; its exit code and
+    outputs are still asserted, without making a healthy commit look broken.
+14. **The first repair still leaked its explanatory notice.** Run #6 was green,
+    but direct check-run API inspection found one notice on the intentional
+    failure job. Explanatory workflow commands are now gated by the same
+    `annotations` input. Seven regression tests cover count reconciliation,
+    severity, failure preservation, clean output, and complete suppression.
 
 ---
 
 ## 8 · The claim this project does and does not make
 
-Skerry is **not described as production-ready**. A successful CI matrix is
-strong pre-release evidence, not evidence of production use or real-world
-false-positive rates.
+Skerry is **not described as production-ready**. A successful CI matrix and
+Marketplace listing are strong automated evidence, not evidence of production
+use or real-world false-positive rates.
 
 What the evidence supports: the implementation is complete, its rules behave as
 documented against real and adversarial input, it handles hostile filenames
 without allowing them to alter its output, it is deterministic, and it has no
 dependencies.
 
-What the evidence does not support: Marketplace acceptance, pull-request diff
-annotation rendering, performance near the documented caps, or behaviour on
-repositories it has never seen.
+What the evidence does not support: live Action execution on macOS or Windows,
+pull-request diff annotation rendering, performance near the documented caps,
+or behaviour on repositories it has never seen.
 
 ---
 
