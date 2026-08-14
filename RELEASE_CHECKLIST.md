@@ -40,26 +40,27 @@ publishes, pushes, or registers anything by itself.
 - [ ] Confirm **Publish this Action to the GitHub Marketplace** remains selected
 - [ ] Confirm the accepted Marketplace name remains **Skerry Path Guard**
 - [ ] Primary category: **Code quality**. Secondary: **Utilities**
-- [ ] Tag: `v1.0.1`
-- [ ] Release title and notes: copy from `MARKETPLACE.md`
-- [ ] Publish
+- [x] Tag: `v1.0.1`
+- [x] Release title and notes: copy from `MARKETPLACE.md`
+- [x] Publish
 
 ## Immediately after
 
-- [ ] Create the moving major tag so `@v1` resolves:
-      `git tag -f v1 v1.0.1 && git push -f origin v1`
+- [x] Create or move the major `v1` ref so `@v1` resolves. Skerry currently
+      maintains this as a branch:
+      `git branch -f v1 v1.0.1 && git push -f origin v1`
 - [ ] Open the Marketplace listing and confirm the description and icon render
 - [ ] Test the published Action from a **different** repository, pinned to
       `@v1`, and confirm it runs. Until this is done, "works as a published
       Action" is untested
-- [ ] Update `CHANGELOG.md` to move `1.0.1` from unreleased to the release date
+- [x] Update `CHANGELOG.md` to move `1.0.1` from unreleased to the release date
 
 ## For each later release
 
 - [ ] Bump `VERSION`, `package.json`, and `CHANGELOG.md` together
 - [ ] New rules go in a **major** version only. Adding a rule in a minor
       version can turn a passing repository red without warning
-- [ ] Move the major tag after each release, or `@v1` will point at old code
+- [ ] Move the major `v1` ref after each release, or `@v1` will point at old code
 - [ ] Re-run every gate; do not release on a partial run
 
 ## Deliberately not on this list

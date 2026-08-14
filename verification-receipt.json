@@ -20,8 +20,13 @@
     "intentional_failure_check_run": 94826964220,
     "intentional_failure_annotations": 0,
     "marketplace_listing": "https://github.com/marketplace/actions/skerry-path-guard",
-    "published_release": "v1.0.0",
-    "candidate_release": "v1.0.1",
+    "published_release": "v1.0.1",
+    "release_commit": "27b328c124aa3c69e83a659587e727183d2cf803",
+    "moving_major_ref": {
+      "name": "v1",
+      "kind": "branch",
+      "commit": "27b328c124aa3c69e83a659587e727183d2cf803"
+    },
     "runner_matrix": [
       "ubuntu-latest / Node 20",
       "ubuntu-latest / Node 22",
@@ -170,8 +175,6 @@
       "SARIF schema validation"
     ],
     "owner_required": [
-      "publish release v1.0.1",
-      "move the major v1 tag to v1.0.1",
       "test the published Action from a different repository and operating system"
     ]
   },

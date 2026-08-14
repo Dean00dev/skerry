@@ -7,7 +7,7 @@ All notable changes to this project are documented here. The format follows
 New rules change results for existing users, so they ship only in major
 versions. Pinning to `@v1` freezes the rule set.
 
-## [1.0.1] — unreleased
+## [1.0.1] — 2026-08-14
 
 ### Fixed
 

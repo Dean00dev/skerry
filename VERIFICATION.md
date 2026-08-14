@@ -7,9 +7,9 @@ This document exists so that nothing in this repository has to be taken on
 trust. It separates what was actually executed from what was simulated and what
 has not been demonstrated at all.
 
-Skerry is public on GitHub. Version 1.0.0 was released and accepted into the
+Skerry is public on GitHub. Version 1.0.1 is released through the existing
 [GitHub Marketplace](https://github.com/marketplace/actions/skerry-path-guard).
-The 1.0.1 candidate has run successfully in GitHub Actions on Ubuntu, macOS and
+Version 1.0.1 ran successfully in GitHub Actions on Ubuntu, macOS and
 Windows with Node 20, 22 and 24. Claude's baseline was produced locally on Node
 22.22.2 with network disabled. ChatGPT / Super Sol independently reproduced the
 baseline, reviewed the implementation, integrated it on GitHub, and verified
@@ -171,7 +171,7 @@ visible.
 Honest gaps. None is hidden.
 
 - **Marketplace acceptance is demonstrated; external use is not.** GitHub lists
-  Skerry Path Guard and release 1.0.0 publicly. This receipt has not found a
+  Skerry Path Guard and release 1.0.1 publicly. This receipt has not found a
   workflow in an unrelated repository invoking the published Action.
 - **Cross-platform Action execution is only partially demonstrated.** The full
   test suite passes on Ubuntu, macOS and Windows, but the three live `uses: ./`
@@ -196,9 +196,7 @@ Honest gaps. None is hidden.
 Nothing in this project can do any of these, and nothing attempted to.
 
 1. Enable Issues and Private vulnerability reporting if not already enabled
-2. Publish the reviewed 1.0.1 release
-3. Move the major `v1` tag to the reviewed 1.0.1 commit
-4. Test the published Action from a different repository and operating system
+2. Test the published Action from a different repository and operating system
 
 Full sequence in `RELEASE_CHECKLIST.md`.
 
