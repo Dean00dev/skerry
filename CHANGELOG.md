@@ -14,13 +14,14 @@ versions. Pinning to `@v1` freezes the rule set.
 - The explanatory “Path hazards found” workflow command is now a notice rather
   than an additional error, so GitHub's error annotation total reconciles with
   Skerry's `errors` output.
-- The deliberately hazardous CI self-test now suppresses annotations, avoiding
-  intentional findings being permanently attached to otherwise healthy
-  commits. Its exit status and outputs remain asserted downstream.
+- The deliberately hazardous CI self-test now emits no workflow annotations,
+  avoiding intentional findings or explanatory notices being permanently
+  attached to otherwise healthy commits. Its exit status and outputs remain
+  asserted downstream.
 
 ### Verification
 
-- Added six regression tests covering annotation-count reconciliation, failure
+- Added seven regression tests covering annotation-count reconciliation, failure
   semantics and the negative CI job's annotation boundary.
 
 ## [1.0.0] — 2026-08-13

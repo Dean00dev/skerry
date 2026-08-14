@@ -65,6 +65,7 @@ function runAction(inputs) {
     outputs,
     errorLines: count('::error'),
     warningLines: count('::warning'),
+    noticeLines: count('::notice'),
   };
 }
 
@@ -114,7 +115,25 @@ test('a clean run emits no annotations or failure explainer', () => {
   assert.equal(result.status, 0);
   assert.equal(result.errorLines, 0);
   assert.equal(result.warningLines, 0);
+  assert.equal(result.noticeLines, 0);
   assert.ok(!result.stdout.includes('Path hazards found'));
+});
+
+test('annotations false emits no workflow commands on failure', () => {
+  const file = writeManifest('src/a.txt\nsrc/A.txt\n');
+  const result = runAction({
+    source: 'list',
+    'paths-file': file,
+    annotations: 'false',
+    summary: 'false',
+  });
+
+  assert.equal(result.status, 1, 'plain text output must not weaken the gate');
+  assert.equal(result.outputs.passed, 'false');
+  assert.equal(result.errorLines, 0);
+  assert.equal(result.warningLines, 0);
+  assert.equal(result.noticeLines, 0);
+  assert.ok(!result.stdout.split('\n').some((line) => line.startsWith('::')));
 });
 
 test('the deliberately failing CI job suppresses annotations', () => {
