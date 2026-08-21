@@ -1,6 +1,6 @@
 # Marketplace listing copy
 
-The accepted listing metadata and release copy for the next patch release.
+The accepted listing metadata and release copy for the next release.
 
 ## Listing title
 
@@ -53,33 +53,41 @@ separate copy is needed.
 ## Release title
 
 ```
-Skerry Path Guard v1.0.1 — Annotation integrity repairs
+Skerry Path Guard v1.1.0 — Baselines and Ref Guards
 ```
 
 ## Release notes
 
 ```markdown
-Patch release repairing the integrity of GitHub workflow annotations.
+Adopt Skerry without turning an existing backlog into an instant red build—and optionally catch Windows-hostile branch and tag names before they reach somebody's checkout.
 
-## Fixed
+## Added
 
-- GitHub's error-annotation total now matches Skerry's `errors` output. The
-  explanatory “Path hazards found” line is no longer counted as another error.
-- The deliberately failing CI self-test no longer attaches expected findings or
-  explanatory notices to otherwise healthy commits.
-- `annotations: false` now suppresses every workflow annotation command while
-  preserving Skerry's exit code, outputs and build-gating behaviour.
+- Deterministic `write-baseline` / `baseline` adoption flow. Existing exact
+  rule/path findings are counted as suppressed; anything new still fails.
+- Stale baseline counts expose entries that no longer match after a fix.
+- Opt-in SK012 for Git-valid branch/tag names Windows cannot represent.
+- Opt-in SK013 for case/normalization ref collisions within the same namespace.
+- Ref and baseline coverage in outputs, summaries and deterministic JSON receipts.
+
+## Boundaries
+
+- `check-refs` is off by default, so existing pinned v1 workflows retain their
+  v1.0 path-only result until they opt in.
+- Ref checks use local refs and the pull-request head only. No network calls.
+- A baseline records identity, not whether an exception is justified or safe.
+- Ref SARIF results deliberately carry no fabricated physical file location.
 
 ## Verification
 
-- 176 automated tests pass with zero failures.
+- 196 automated tests pass with zero failures.
 - All nine Ubuntu, macOS and Windows × Node 20, 22 and 24 test cells pass.
-- Four live integration jobs pass.
-- GitHub's check-run API reports zero annotations for the intentional failure
-  job.
+- All 15 hosted CI jobs pass, including live baseline round-trip and hostile-ref
+  integration gates.
+- Zero runtime dependencies; Node standard library only.
 
-No rules, defaults, inputs or runtime dependencies changed in this patch.
-See `VERIFICATION.md` for the disclosed run history and remaining boundaries.
+See `VERIFICATION.md` for the reconciled archive/live history, disclosed
+regressions avoided, hosted run, and remaining boundaries.
 ```
 
 ## Topics to add to the repository

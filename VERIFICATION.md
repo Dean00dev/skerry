@@ -35,7 +35,14 @@ until the pull-request matrix completes.
 | Strict self-scan | 59 tracked paths, 0 findings |
 | Baseline live-process round trip | passed |
 | Opt-in pull-request ref process test | expected SK012 failure observed |
-| GitHub matrix and live Action jobs | **pending PR execution** |
+| GitHub matrix and live Action jobs | **15/15 passed** — [run 32496293431](https://github.com/Dean00dev/skerry/actions/runs/32496293431) |
+
+The hosted run covered Ubuntu, macOS and Windows on Node 20, 22 and 24, plus
+metadata/security checks and six live-Action jobs. The new baseline job wrote a
+ledger, consumed it, and asserted the suppression/stale outputs. The new ref
+job created a Git-valid `feature/aux` branch, observed the expected Skerry
+failure, and asserted the error/ref counts. No v1.1 hosted claim predates this
+run.
 
 The remainder of this receipt preserves the released v1.0.1 evidence and its
 disclosed run history.
