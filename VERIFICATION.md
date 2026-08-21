@@ -1,7 +1,7 @@
 # Verification receipt
 
-**Skerry 1.0.1** · original Claude verification, independent integration
-review, and live annotation-integrity repair through 14 August 2026
+**Skerry 1.1.0 candidate** · reconciled from the released v1.0.1 tree and
+Claude's independently built v1.1 archive on 21 August 2026
 
 This document exists so that nothing in this repository has to be taken on
 trust. It separates what was actually executed from what was simulated and what
@@ -13,8 +13,39 @@ Version 1.0.1 ran successfully in GitHub Actions on Ubuntu, macOS and
 Windows with Node 20, 22 and 24. Claude's baseline was produced locally on Node
 22.22.2 with network disabled. ChatGPT / Super Sol independently reproduced the
 baseline, reviewed the implementation, integrated it on GitHub, and verified
-the 1.0.1 repairs against GitHub's check-run API. The final local state passed
-on Node 24.14.0, Linux x86_64, git 2.51.1.
+the 1.0.1 repairs against GitHub's check-run API.
+
+For the v1.1 candidate, Claude's delivered archive was first extracted and
+verified at **191/191 tests**. It was not copied over the live tree: doing so
+would have reverted v1.0.1 source fail-closed behaviour, COM0/LPT0 semantics,
+portable end-to-end repairs, and annotation suppression. The baseline and ref
+features were instead reconciled onto live v1.0.1 and independently hardened.
+The resulting candidate passes **196/196 local tests**, metadata consistency,
+credential scanning, strict self-scan, and diff checks on Node 24.19.0, Linux
+x86_64, git 2.51.1. Hosted GitHub runner results are intentionally not claimed
+until the pull-request matrix completes.
+
+### v1.1 candidate gates
+
+| Gate | Result |
+| --- | --- |
+| Reconciled test suite | **196 passed, 0 failed, 0 skipped** |
+| Metadata consistency | passed, 0 notes |
+| Credential scan | clean — 59 text files, 9 patterns |
+| Strict self-scan | 59 tracked paths, 0 findings |
+| Baseline live-process round trip | passed |
+| Opt-in pull-request ref process test | expected SK012 failure observed |
+| GitHub matrix and live Action jobs | **15/15 passed** — [run 32496293431](https://github.com/Dean00dev/skerry/actions/runs/32496293431) |
+
+The hosted run covered Ubuntu, macOS and Windows on Node 20, 22 and 24, plus
+metadata/security checks and six live-Action jobs. The new baseline job wrote a
+ledger, consumed it, and asserted the suppression/stale outputs. The new ref
+job created a Git-valid `feature/aux` branch, observed the expected Skerry
+failure, and asserted the error/ref counts. No v1.1 hosted claim predates this
+run.
+
+The remainder of this receipt preserves the released v1.0.1 evidence and its
+disclosed run history.
 
 ---
 

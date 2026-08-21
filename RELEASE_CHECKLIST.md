@@ -58,8 +58,8 @@ publishes, pushes, or registers anything by itself.
 ## For each later release
 
 - [ ] Bump `VERSION`, `package.json`, and `CHANGELOG.md` together
-- [ ] New rules go in a **major** version only. Adding a rule in a minor
-      version can turn a passing repository red without warning
+- [ ] New rules that run by default go in a **major** version. A minor release
+      may add a rule only when it is disabled by default and requires opt-in
 - [ ] Move the major `v1` ref after each release, or `@v1` will point at old code
 - [ ] Re-run every gate; do not release on a partial run
 

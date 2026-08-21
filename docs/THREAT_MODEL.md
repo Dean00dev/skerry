@@ -22,7 +22,8 @@ The attacker can open a pull request against a repository that runs Skerry. Ther
 
 The attacker does **not** control the workflow file, the Action inputs, or the runner configuration. Inputs are treated as trusted-but-validated: they come from the workflow author, and the standard warning about interpolating untrusted expressions into a workflow applies to Skerry exactly as it does to every other Action.
 
-Everything a repository can influence — filenames, path depth, file modes — is treated as hostile.
+Everything a repository can influence — filenames, path depth, file modes and
+the opt-in pull-request ref name — is treated as hostile.
 
 ---
 
@@ -121,13 +122,31 @@ A team sees a green Skerry badge and concludes something Skerry never claimed. S
 
 ---
 
+## T9 · Exception-ledger abuse
+
+**Attack.** A malformed, enormous or partial baseline suppresses findings the
+operator did not intend, or a truncated scan is recorded as if it were complete.
+
+**Defence.** Baselines are workflow-author inputs, but are still validated:
+bounded file and entry counts, exact schema and count, known rule ids, unique
+single-line entries, and regular-file checks. Baseline operations fail closed
+when `max-findings` truncated the identity set. Suppressed and stale totals are
+exposed in outputs, summaries and JSON receipts.
+
+**Residual risk.** A reviewer can intentionally commit a baseline containing a
+real hazard. Skerry establishes deterministic identity and drift, not whether
+an exception is justified. Protect baseline changes with ordinary code review.
+
+---
+
 ## What Skerry does not protect against
 
 - Anything in file *contents*, including Trojan Source attacks in source code
 - Malicious code, dependency compromise, or workflow tampering
 - Clone-time symlink attacks. SK010 reports a hazard *shape*; it does not prove exploitability and is not a mitigation
 - Case-insensitivity behaviour on a filesystem whose folding tables differ from JavaScript's
-- Branch and tag name collisions, which are a real and related problem that Skerry does not currently check
+- Remote-only branch and tag hazards not present in the local checkout; opt-in
+  SK012/SK013 make no network requests
 - Anything at all outside the checked-out tree
 
 ## Reporting
