@@ -1,6 +1,6 @@
 # Rules
 
-Every rule has a stable id. Ids are never reused and never renumbered. Rules added in a minor release must be off by default, so an existing pinned workflow cannot change result without opting in.
+Every rule has a stable id. Ids are never reused and never renumbered. New rules are added at the end of the list and only ship in a major version, so pinning to `@v1` freezes the rule set.
 
 Each entry below says what fires, why it matters, and — importantly — when the rule is wrong.
 
@@ -134,34 +134,6 @@ Requires file modes, so it is available from the `git` and `fs` sources, and fro
 **When it is wrong** Some scripts legitimately use U+200C. That is why this is a warning rather than an error.
 
 ---
-
-## SK012 · ref-name-hazard · error · opt-in
-
-**Fires when** a locally available branch or tag has a component matching a
-Windows reserved device name, contains `<`, `>`, `"` or `|`, or ends in a dot
-or space. Git permits these shapes even though Windows cannot store the ref
-file reliably.
-
-**Why** Git represents branches and tags below its ref namespace. A contributor
-can therefore create a branch that is legal to Git but unusable on Windows.
-
-**Boundaries** Enable with `check-refs: true`. Skerry makes no network request
-and sees only refs present in the checkout plus the pull-request head exposed by
-the runner. Git already rejects other illegal ref characters. `COM0` and `LPT0`
-are not treated as reserved device names because Windows does not reserve them.
-
-## SK013 · ref-case-collision · error · opt-in
-
-**Fires when** two local branches, or two local tags, are identical after NFC
-normalization and lower-casing but have different stored names.
-
-**Why** Case-insensitive or normalization-insensitive filesystems cannot
-reliably represent both ref files.
-
-**Boundaries** Branches are compared with branches and tags with tags; an
-ordinary branch and tag sharing a name are separate namespaces and do not
-collide. The Unicode folding approximation has the same limitations as SK001
-and SK002. Enable with `check-refs: true`.
 
 ## Severity and thresholds
 

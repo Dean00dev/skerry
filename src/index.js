@@ -19,8 +19,6 @@ const { resolveInputs, InputError } = require('./inputs');
 const { compileAll, PatternError } = require('./match');
 const { collect, SourceError } = require('./sources');
 const { scan } = require('./scan');
-const { collectRefs, scanRefs, RefError } = require('./refs');
-const baselineModule = require('./baseline');
 const { renderAnnotations, renderConsole, renderSummary, sanitizeDisplay } = require('./render');
 const { buildJsonReport, buildSarifReport } = require('./report');
 
@@ -30,11 +28,6 @@ function out(line) {
 
 function commandError(message) {
   out(`::error title=Skerry::${String(message).replace(/%/g, '%25').replace(/\r/g, '%0D').replace(/\n/g, '%0A')}`);
-}
-
-function notice(enabled, message) {
-  const safe = sanitizeDisplay(message);
-  out(enabled ? `::notice title=Skerry::${safe}` : `NOTICE  Skerry: ${safe}`);
 }
 
 /**
@@ -102,70 +95,17 @@ function run(argv) {
   });
 
   if (collected.fellBack) {
-    notice(inputs.annotations, 'No git work tree detected, so the filesystem was walked instead. Untracked and ignored files are included in this mode.');
+    out(
+      '::notice title=Skerry::No git work tree detected, so the filesystem was walked instead. Untracked and ignored files are included in this mode.'
+    );
   }
 
-  let result = scan(collected.entries, {
+  const result = scan(collected.entries, {
     disable: inputs.disable,
     ignore: compiled,
     maxPathLength: inputs.maxPathLength,
     maxFindings: inputs.maxFindings,
   });
-
-  if (result.truncated && (inputs.baseline || inputs.writeBaseline)) {
-    throw new baselineModule.BaselineError('baseline operations require the complete finding set; increase max-findings until output is not truncated');
-  }
-
-  let refsScanned = 0;
-  if (inputs.checkRefs) {
-    const refResult = scanRefs(collectRefs(scanDir, process.env), { disable: inputs.disable });
-    refsScanned = refResult.scanned;
-    for (const finding of refResult.findings) {
-      result.counts[finding.severity] += 1;
-      result.counts.total += 1;
-    }
-    result.total += refResult.findings.length;
-    result.findings = result.findings.concat(refResult.findings).sort((a, b) => {
-      const severity = SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity];
-      return severity || (a.path < b.path ? -1 : a.path > b.path ? 1 : (a.rule < b.rule ? -1 : a.rule > b.rule ? 1 : 0));
-    });
-  }
-
-  if (inputs.writeBaseline) {
-    const written = baselineModule.write(inputs.writeBaseline, result.findings);
-    notice(inputs.annotations, `Baseline written with ${written.count} entr${written.count === 1 ? 'y' : 'ies'}. Commit it, then configure baseline so only new findings fail.`);
-    writeOutputs({
-      findings: result.counts.total,
-      errors: result.counts.error,
-      warnings: result.counts.warning,
-      notices: result.counts.notice,
-      scanned: result.scanned,
-      ignored: result.ignored,
-      'refs-scanned': refsScanned,
-      baselined: 0,
-      'baseline-stale': 0,
-      passed: 'true',
-      source: collected.source,
-      'report-json-path': '',
-      'report-sarif-path': '',
-    });
-    return EXIT.OK;
-  }
-
-  let baselined = 0;
-  let stale = [];
-  if (inputs.baseline) {
-    result = baselineModule.apply(result, baselineModule.load(inputs.baseline));
-    baselined = result.baselined;
-    stale = result.stale;
-    if (baselined) notice(inputs.annotations, `${baselined} known finding(s) suppressed by the baseline. New findings still fail.`);
-    if (stale.length) notice(inputs.annotations, `${stale.length} baseline entr${stale.length === 1 ? 'y no longer matches' : 'ies no longer match'} and should be pruned.`);
-  }
-
-  if (result.findings.length > inputs.maxFindings) {
-    result.findings = result.findings.slice(0, inputs.maxFindings);
-    result.truncated = true;
-  }
 
   if (inputs.annotations) {
     for (const line of renderAnnotations(result.findings)) out(line);
@@ -174,7 +114,9 @@ function run(argv) {
   }
 
   if (result.truncated) {
-    notice(inputs.annotations, `Output truncated at ${inputs.maxFindings} findings. ${result.total} findings were detected in total.`);
+    out(
+      `::notice title=Skerry::Output truncated at ${inputs.maxFindings} findings. ${result.total} findings were detected in total.`
+    );
   }
 
   const meta = {
@@ -183,9 +125,6 @@ function run(argv) {
     failOn: inputs.failOn,
     disabled: inputs.disable,
     ignorePatterns: inputs.ignorePatterns,
-    checkRefs: inputs.checkRefs,
-    refsScanned,
-    baseline: { configured: Boolean(inputs.baseline), suppressed: baselined, stale: stale.length },
   };
 
   let jsonPath = '';
@@ -204,20 +143,15 @@ function run(argv) {
     notices: result.counts.notice,
     scanned: result.scanned,
     ignored: result.ignored,
-    'refs-scanned': refsScanned,
-    baselined,
-    'baseline-stale': stale.length,
     passed: failing ? 'false' : 'true',
     source: collected.source,
     'report-json-path': jsonPath,
     'report-sarif-path': sarifPath,
   });
 
-  const suppressed = baselined ? ` ${baselined} suppressed by baseline.` : '';
-  const clean = inputs.baseline ? 'no new hazards found' : 'no hazards found';
   const headline = result.counts.total === 0
-    ? `${TOOL_NAME} ${VERSION}: scanned ${result.scanned} path(s), ${clean}.${suppressed}`
-    : `${TOOL_NAME} ${VERSION}: scanned ${result.scanned} path(s), ${result.counts.error} error(s), ${result.counts.warning} warning(s).${suppressed}`;
+    ? `${TOOL_NAME} ${VERSION}: scanned ${result.scanned} path(s), no hazards found.`
+    : `${TOOL_NAME} ${VERSION}: scanned ${result.scanned} path(s), ${result.counts.error} error(s), ${result.counts.warning} warning(s).`;
   out(headline);
 
   if (failing) {
@@ -225,7 +159,9 @@ function run(argv) {
       // This explains the failing result; it is not another finding. Emitting
       // it as an error made GitHub's annotation total exceed the `errors`
       // output by one. The exit code below still fails the step.
-      notice(true, 'Path hazards found. See the annotations above, or change fail-on to alter the threshold.');
+      out(
+        '::notice title=Skerry::Path hazards found. See the annotations above, or run this Action with fail-on: warning|never to change the threshold.'
+      );
     }
     return EXIT.FINDINGS;
   }
@@ -236,8 +172,7 @@ function main() {
   try {
     process.exitCode = run(process.argv.slice(2));
   } catch (err) {
-    if (err instanceof InputError || err instanceof PatternError || err instanceof SourceError
-      || err instanceof baselineModule.BaselineError || err instanceof RefError) {
+    if (err instanceof InputError || err instanceof PatternError || err instanceof SourceError) {
       commandError(sanitizeDisplay(err.message));
       process.exitCode = EXIT.USAGE;
       return;

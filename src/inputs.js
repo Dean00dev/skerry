@@ -31,9 +31,6 @@ const SPEC = {
   'report-sarif': { default: '' },
   source: { default: 'auto' },
   'paths-file': { default: '' },
-  'check-refs': { default: 'false' },
-  baseline: { default: '' },
-  'write-baseline': { default: '' },
 };
 
 const INPUT_NAMES = Object.freeze(Object.keys(SPEC));
@@ -160,12 +157,6 @@ function resolveInputs(env = process.env, argv = []) {
     throw new InputError('input "path" must not contain newline or NUL characters');
   }
 
-  const baseline = parseOutputPath('baseline', get('baseline'));
-  const writeBaseline = parseOutputPath('write-baseline', get('write-baseline'));
-  if (baseline && writeBaseline) {
-    throw new InputError('inputs "baseline" and "write-baseline" cannot be used together');
-  }
-
   return {
     path: scanPath,
     ignorePatterns: parsePatternList(get('ignore')),
@@ -179,9 +170,6 @@ function resolveInputs(env = process.env, argv = []) {
     reportSarif: parseOutputPath('report-sarif', get('report-sarif')),
     source,
     pathsFile,
-    checkRefs: parseBoolean('check-refs', get('check-refs')),
-    baseline,
-    writeBaseline,
   };
 }
 
