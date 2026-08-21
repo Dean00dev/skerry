@@ -7,7 +7,7 @@
  * never reused or renumbered. New rules are added at the end.
  */
 
-const VERSION = '1.0.1';
+const VERSION = '1.1.0';
 const TOOL_NAME = 'Skerry';
 const REPORT_SCHEMA = 'skerry-report/1';
 
@@ -105,9 +105,26 @@ const RULES = Object.freeze({
     summary: 'Path contains a zero-width or invisible formatting character.',
     help: 'Legitimate in some scripts, but invisible in review. U+200D ZERO WIDTH JOINER is deliberately excluded because emoji sequences require it.',
   },
+  SK012: {
+    id: 'SK012',
+    name: 'ref-name-hazard',
+    severity: SEVERITY.ERROR,
+    summary: 'A branch or tag name cannot be represented on a Windows filesystem.',
+    help: 'Git stores refs as files. Names containing a reserved device component or < > " | cannot be represented by Windows.',
+  },
+  SK013: {
+    id: 'SK013',
+    name: 'ref-case-collision',
+    severity: SEVERITY.ERROR,
+    summary: 'Two branch or tag names differ only by case or Unicode normalization.',
+    help: 'Within the same ref namespace, case-insensitive or normalization-insensitive filesystems cannot represent both names reliably.',
+  },
 });
 
 const RULE_IDS = Object.freeze(Object.keys(RULES));
+
+/** Characters Git permits in refs that Windows filesystems reject. */
+const REF_ILLEGAL_CHARS = Object.freeze(new Set(['<', '>', '"', '|']));
 
 /**
  * Windows reserved device base names, upper case.
@@ -169,6 +186,7 @@ module.exports = {
   RULE_IDS,
   WINDOWS_RESERVED,
   WINDOWS_ILLEGAL_CHARS,
+  REF_ILLEGAL_CHARS,
   isBidiControl,
   isInvisibleFormat,
   isControlChar,

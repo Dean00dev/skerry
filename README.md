@@ -36,6 +36,8 @@ Skerry reads **path names only**. It never opens a scanned repository file, so i
 | `SK009` | error | Bidirectional overrides and Unicode tag characters that hide the real name |
 | `SK010` | error | A symlink taking part in a case or normalization collision |
 | `SK011` | warning | Zero-width and invisible formatting characters |
+| `SK012` | error | Branch or tag components Windows cannot represent *(opt-in)* |
+| `SK013` | error | Branch or tag names colliding by case or normalization *(opt-in)* |
 
 Full descriptions, rationale and false-positive notes: [docs/RULES.md](docs/RULES.md).
 
@@ -93,6 +95,29 @@ jobs:
 - run: echo "Skerry found ${{ steps.skerry.outputs.errors }} error(s)"
 ```
 
+### Adopt without failing on existing findings
+
+First create and commit a deterministic baseline:
+
+```yaml
+- uses: Dean00dev/skerry@v1
+  with:
+    write-baseline: .skerry-baseline.json
+```
+
+Then gate only findings that are not in that exact rule/path ledger:
+
+```yaml
+- uses: Dean00dev/skerry@v1
+  with:
+    baseline: .skerry-baseline.json
+    check-refs: true
+```
+
+Skerry reports aggregate suppressed and stale counts. A baseline is not an
+allowlist or a safety verdict; stale entries should be removed, and baseline
+creation fails closed if the finding list was truncated.
+
 ## Inputs
 
 | Input | Default | Description |
@@ -109,6 +134,9 @@ jobs:
 | `report-sarif` | *(empty)* | Write a SARIF 2.1.0 report to this path. Uploading it is your choice and needs your own `security-events` permission. |
 | `source` | `auto` | Where the path list comes from: `auto`, `git`, `fs`, or `list`. |
 | `paths-file` | *(empty)* | Newline separated path manifest, required when `source` is `list`. |
+| `check-refs` | `false` | Check local branches and tags with opt-in SK012/SK013. No network calls are made. |
+| `baseline` | *(empty)* | Suppress exact rule/path identities recorded in a Skerry baseline. |
+| `write-baseline` | *(empty)* | Write a deterministic baseline of current findings and exit 0. |
 
 An unknown value for any input is a usage error, not a silent default. A typo in `disable` fails the step rather than quietly doing nothing.
 
@@ -122,6 +150,9 @@ An unknown value for any input is a usage error, not a silent default. A typo in
 | `notices` | Number of notice severity findings. |
 | `scanned` | Paths scanned after ignore patterns were applied. |
 | `ignored` | Paths excluded by ignore patterns. |
+| `refs-scanned` | Local branch and tag refs scanned; `0` when ref checks are off. |
+| `baselined` | Findings suppressed by the configured baseline. |
+| `baseline-stale` | Baseline entries that no longer match a finding. |
 | `passed` | `true` when the scan is below the threshold, otherwise `false`. |
 | `source` | The path source actually used: `git`, `fs`, or `list`. |
 | `report-json-path` | Absolute path of the JSON report, or empty. |
@@ -162,11 +193,11 @@ These are real. Read them before trusting the result.
 - **Case folding is approximate.** Skerry uses JavaScript's Unicode case mapping. NTFS and APFS use their own tables and diverge at the edges, such as the Turkish dotless ı and the Kelvin sign. A collision Skerry reports is a collision on most systems, not provably a collision on all of them.
 - **Normalization is approximate.** Behaviour differs between HFS+ and APFS and across macOS versions. SK002 identifies the hazard shape, not a guaranteed outcome on a specific machine.
 - **`max-path-length` is a heuristic.** The real Windows limit depends on where the repository is cloned and whether long paths are enabled. The default of 200 leaves room for a typical clone directory; it is not a measurement.
-- **Only what is checked out.** Shallow and sparse checkouts, ignored files, and the interiors of submodules are invisible. Branch and tag names are not checked, only tracked paths.
+- **Only locally available state.** Shallow and sparse checkouts, ignored files, remote-only refs, and submodule interiors are invisible. SK012/SK013 inspect local refs only and are off by default.
 - **Requires git for the best results.** Without a git work tree, Skerry walks the filesystem instead and will then also see untracked and ignored files. It says so in the log when this happens.
 - **Non-UTF-8 filenames degrade.** A path that is not valid UTF-8 is decoded with replacement characters, which may change how it is reported.
 - **Some repositories will disagree with it.** Projects that target Linux exclusively sometimes contain deliberate case collisions or a file named `aux.c`. Use `ignore` or `disable`; do not fight the tool.
-- **New rules can turn a green repository red.** New rules ship only in major versions. Pin to `@v1` and the rule set will not change under you.
+- **Opt-in rules still need review.** SK012/SK013 were added in a minor release only because `check-refs` defaults to `false`; pinned users retain the v1.0 path-only result unless they opt in.
 
 ## What Skerry is not
 

@@ -132,3 +132,60 @@ jobs:
             echo "::error::implausibly few paths scanned"
             exit 1
           fi
+
+  baseline-roundtrip:
+    name: Baseline works as a live Action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Record the existing fixture findings
+        uses: ./
+        with:
+          source: list
+          paths-file: fixtures/unsafe/case-collision.txt
+          write-baseline: skerry-baseline.json
+          annotations: false
+          summary: false
+      - name: Gate the same findings through the baseline
+        id: baseline
+        uses: ./
+        with:
+          source: list
+          paths-file: fixtures/unsafe/case-collision.txt
+          baseline: skerry-baseline.json
+          annotations: false
+          summary: false
+      - name: Assert the live outputs
+        env:
+          BASELINED: ${{ steps.baseline.outputs.baselined }}
+          STALE: ${{ steps.baseline.outputs.baseline-stale }}
+          PASSED: ${{ steps.baseline.outputs.passed }}
+        run: |
+          test "$BASELINED" = "6"
+          test "$STALE" = "0"
+          test "$PASSED" = "true"
+
+  ref-check:
+    name: Ref checks work as a live Action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Create a Git-valid Windows-hostile local branch
+        run: git branch feature/aux
+      - name: Check refs
+        id: refs
+        continue-on-error: true
+        uses: ./
+        with:
+          check-refs: true
+          annotations: false
+          summary: false
+      - name: Assert the expected ref failure
+        env:
+          OUTCOME: ${{ steps.refs.outcome }}
+          ERRORS: ${{ steps.refs.outputs.errors }}
+          REFS: ${{ steps.refs.outputs.refs-scanned }}
+        run: |
+          test "$OUTCOME" = "failure"
+          test "$ERRORS" -ge 1
+          test "$REFS" -ge 1
