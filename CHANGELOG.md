@@ -4,8 +4,41 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-New rules change results for existing users, so they ship only in major
-versions. Pinning to `@v1` freezes the rule set.
+New rules that run by default change existing results and therefore require a
+major version. Minor releases may add rules only when they are opt-in.
+
+## [1.1.0] — 2026-08-21
+
+### Added
+
+- Deterministic baseline creation and exact rule/path suppression, with stale
+  entry counts so fixed findings can be pruned without silently widening the
+  exception ledger.
+- Opt-in local branch and tag checks: SK012 for Windows-incompatible ref names
+  and SK013 for case/normalization collisions within a ref namespace.
+- JSON receipt fields and step outputs for ref coverage and aggregate baseline
+  state. Ref findings carry no fabricated file location in annotations or SARIF.
+
+### Hardened
+
+- Baseline operations fail closed on truncated scans, malformed counts,
+  duplicate or unknown-rule entries, non-files, and bounded-size violations.
+- Ref enumeration is bounded and fails closed on errors inside a detected Git
+  work tree. Pull-request head refs are distinguished from GitHub's synthetic
+  merge ref, and branch/tag namespaces cannot create false collisions.
+- All notices continue to respect `annotations: false`; v1.0.1's source
+  collection, COM0/LPT0, annotation reconciliation, and portable e2e repairs
+  remain intact.
+
+### Compatibility
+
+- `check-refs` is `false` by default. Without baseline/ref inputs, v1.1 keeps
+  v1.0's path rules, failure decisions, and clean-run wording.
+
+### Verification
+
+- 191 local tests pass on the reconciled candidate. Hosted GitHub Actions
+  verification remains required before release.
 
 ## [1.0.1] — 2026-08-14
 
@@ -55,5 +88,6 @@ First public release.
 - Resource caps on tree depth, entry count, pattern count, pattern length and
   findings output.
 
+[1.1.0]: https://github.com/Dean00dev/skerry/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/Dean00dev/skerry/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Dean00dev/skerry/releases/tag/v1.0.0
