@@ -37,6 +37,16 @@ test('a baseline suppresses only exact rule and path identities', () => {
   assert.equal(applied.findings[0].rule, 'SK004');
 });
 
+test('baseline round trips paths containing CR and LF', () => {
+  const result = scan(['a\nb.txt', 'c\rd.txt']);
+  assert.ok(result.findings.length >= 2);
+  const file = temp('baseline.json');
+  baseline.write(file, result.findings);
+  const applied = baseline.apply(result, baseline.load(file));
+  assert.equal(applied.findings.length, 0);
+  assert.equal(applied.stale.length, 0);
+});
+
 test('fixed baseline entries are exposed as stale', () => {
   const before = scan(['a', 'A', 'nul']);
   const after = scan(['a', 'b', 'nul']);
@@ -52,7 +62,7 @@ test('baseline validation fails closed on malformed shape, count, duplicates, an
     JSON.stringify({ schema: baseline.BASELINE_SCHEMA, count: 2, entries: ['SK004 nul'] }),
     JSON.stringify({ schema: baseline.BASELINE_SCHEMA, count: 2, entries: ['SK004 nul', 'SK004 nul'] }),
     JSON.stringify({ schema: baseline.BASELINE_SCHEMA, count: 1, entries: ['SK999 x'] }),
-    JSON.stringify({ schema: baseline.BASELINE_SCHEMA, count: 1, entries: ['SK004 x\ny'] }),
+    JSON.stringify({ schema: baseline.BASELINE_SCHEMA, count: 1, entries: ['SK004 x\u0000y'] }),
   ]) {
     const file = temp('bad.json');
     fs.writeFileSync(file, value);

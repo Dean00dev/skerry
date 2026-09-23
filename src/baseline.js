@@ -14,8 +14,11 @@ function keyFor(finding) {
 }
 
 function validateEntry(entry) {
-  if (typeof entry !== 'string' || /[\r\n\u0000]/.test(entry)) {
-    throw new BaselineError('every baseline entry must be a single-line string');
+  // Git permits CR and LF in path names, and those are exactly the hazards a
+  // team may need to adopt. JSON escapes them, so only NUL, which no path can
+  // contain, is rejected.
+  if (typeof entry !== 'string' || entry.includes('\u0000')) {
+    throw new BaselineError('every baseline entry must be a string without NUL characters');
   }
   const separator = entry.indexOf(' ');
   if (separator < 1 || !RULE_IDS.includes(entry.slice(0, separator)) || separator === entry.length - 1) {

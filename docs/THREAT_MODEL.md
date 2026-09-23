@@ -129,7 +129,8 @@ operator did not intend, or a truncated scan is recorded as if it were complete.
 
 **Defence.** Baselines are workflow-author inputs, but are still validated:
 bounded file and entry counts, exact schema and count, known rule ids, unique
-single-line entries, and regular-file checks. Baseline operations fail closed
+NUL-free entries, and regular-file checks. CR and LF are accepted because Git
+permits them in path names and JSON escapes them. Baseline operations fail closed
 when `max-findings` truncated the identity set. Suppressed and stale totals are
 exposed in outputs, summaries and JSON receipts.
 
