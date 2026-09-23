@@ -12,6 +12,8 @@ src/render.js         annotations, log text, job summary, all escaping
 src/report.js         JSON and SARIF
 src/match.js          the ignore pattern matcher
 src/constants.js      rule catalogue and character tables
+src/baseline.js       deterministic exception ledgers
+src/refs.js           bounded local branch/tag collection and checks
 ```
 
 Roughly 1,000 lines of CommonJS, no dependencies, no build step, no bundler, no `dist/` directory. The published source is the running source, so anyone can read exactly what executes in their CI.
@@ -53,6 +55,24 @@ No timestamp, no hostname, no run id, no absolute path in the JSON report. Ident
 ### Failure is decided before truncation
 
 Output is capped at `max-findings` so a pathological repository cannot flood a job log. The counts and the pass/fail decision are computed from the *complete* finding set before truncation, so capping output can never turn a failing scan green. Tested end to end.
+
+Baseline creation and application require finding identities, not only counts.
+They therefore fail closed when the finding set was truncated. A partial
+baseline would be a false receipt and could turn later failures green.
+
+### Baselines are exact exception ledgers
+
+A baseline contains sorted `rule + path` identities and no timestamp. It does
+not say a finding is acceptable or safe; it records that the finding existed at
+adoption time. New identities still gate the build, while unmatched ledger
+entries are counted as stale. The parser bounds bytes and entries and rejects
+duplicate, unknown-rule, malformed, or count-inconsistent data.
+
+### Ref namespaces remain separate
+
+Opt-in ref collection uses only the runner's pull-request head and local Git
+refs; it makes no network call. Branches collide only with branches and tags
+only with tags. SARIF ref results deliberately carry no physical file location.
 
 ### Nodes, not files
 

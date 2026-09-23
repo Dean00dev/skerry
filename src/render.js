@@ -110,7 +110,8 @@ function renderAnnotation(finding) {
       ? safeMessage
       : `${safePath}: ${safeMessage}`;
   } else {
-    message = `${safePath}: ${safeMessage} (path cannot be annotated inline)`;
+    const reason = finding.kind === 'ref' ? 'ref finding; no file annotation' : 'path cannot be annotated inline';
+    message = `${safePath}: ${safeMessage} (${reason})`;
   }
 
   return `::${command} ${props.join(',')}::${escapeData(message)}`;
@@ -146,12 +147,16 @@ function renderSummary(result, meta = {}) {
   lines.push('## Skerry');
   lines.push('');
   const verdict = result.counts.total === 0
-    ? 'No path hazards found.'
+    ? (meta.baseline && meta.baseline.configured ? 'No new hazards found.' : 'No path hazards found.')
     : `${result.counts.error} error(s), ${result.counts.warning} warning(s).`;
   lines.push(verdict);
   lines.push('');
   lines.push(`Scanned ${result.scanned} path(s) via the \`${meta.source || 'unknown'}\` source.`);
   if (result.ignored > 0) lines.push(`Ignored ${result.ignored} path(s) by pattern.`);
+  if (meta.checkRefs) lines.push(`Scanned ${meta.refsScanned || 0} local branch/tag ref(s).`);
+  if (meta.baseline && meta.baseline.configured) {
+    lines.push(`Baseline suppressed ${meta.baseline.suppressed} finding(s); ${meta.baseline.stale} stale entr${meta.baseline.stale === 1 ? 'y' : 'ies'}.`);
+  }
   lines.push('');
 
   if (result.findings.length > 0) {

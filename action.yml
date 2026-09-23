@@ -55,6 +55,18 @@ inputs:
     description: 'Newline separated path manifest, required when source is list.'
     required: false
     default: ''
+  check-refs:
+    description: 'Also check local branch and tag names for Windows hazards. Off by default because it introduces new rules.'
+    required: false
+    default: 'false'
+  baseline:
+    description: 'Path to a Skerry baseline. Matching findings are counted as suppressed and do not fail the build.'
+    required: false
+    default: ''
+  write-baseline:
+    description: 'Write a deterministic baseline of current findings to this path and exit 0.'
+    required: false
+    default: ''
 
 outputs:
   findings:
@@ -69,6 +81,12 @@ outputs:
     description: 'Number of paths scanned after ignore patterns were applied.'
   ignored:
     description: 'Number of paths excluded by ignore patterns.'
+  refs-scanned:
+    description: 'Number of branch and tag refs scanned, or 0 when check-refs is false.'
+  baselined:
+    description: 'Number of findings suppressed by the baseline.'
+  baseline-stale:
+    description: 'Number of baseline entries that no longer match a finding.'
   passed:
     description: 'true when the scan is below the fail-on threshold, otherwise false.'
   source:
