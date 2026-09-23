@@ -161,7 +161,10 @@ reliably represent both ref files.
 **Boundaries** Branches are compared with branches and tags with tags; an
 ordinary branch and tag sharing a name are separate namespaces and do not
 collide. The Unicode folding approximation has the same limitations as SK001
-and SK002. Enable with `check-refs: true`.
+and SK002. Only whole names are compared, so `Feature/x` and `feature/y` are
+not reported, although on a case-insensitive filesystem their loose ref files
+share one directory and one branch may be read back with the other's case.
+Enable with `check-refs: true`.
 
 ## Severity and thresholds
 

@@ -80,7 +80,7 @@ Adopt Skerry without turning an existing backlog into an instant red build—and
 
 ## Verification
 
-- 196 automated tests pass with zero failures.
+- 197 automated tests pass with zero failures.
 - All nine Ubuntu, macOS and Windows × Node 20, 22 and 24 test cells pass.
 - All 15 hosted CI jobs pass, including live baseline round-trip and hostile-ref
   integration gates.
