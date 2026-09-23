@@ -7,7 +7,7 @@ All notable changes to this project are documented here. The format follows
 New rules that run by default change existing results and therefore require a
 major version. Minor releases may add rules only when they are opt-in.
 
-## [1.1.0] — 2026-08-21
+## [1.1.0] — 2026-09-23
 
 ### Added
 
@@ -47,7 +47,7 @@ major version. Minor releases may add rules only when they are opt-in.
 ### Verification
 
 - 197 local tests pass on the reconciled candidate.
-- GitHub Actions [run 32496293431](https://github.com/Dean00dev/skerry/actions/runs/32496293431)
+- GitHub Actions [run 35931109981](https://github.com/Dean00dev/skerry/actions/runs/35931109981)
   passed all 15 jobs: nine OS/Node test cells, metadata/security, four existing
   live-Action checks, and the new baseline/ref integration gates.
 
