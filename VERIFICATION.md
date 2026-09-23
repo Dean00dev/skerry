@@ -1,6 +1,6 @@
 # Verification receipt
 
-**Skerry 1.1.0 candidate** · reconciled from the released v1.0.1 tree and
+**Skerry 1.1.0** · reconciled from the released v1.0.1 tree and
 Claude's independently built v1.1 archive on 21 August 2026
 
 This document exists so that nothing in this repository has to be taken on
@@ -22,20 +22,27 @@ portable end-to-end repairs, and annotation suppression. The baseline and ref
 features were instead reconciled onto live v1.0.1 and independently hardened.
 The resulting candidate passes **196/196 local tests**, metadata consistency,
 credential scanning, strict self-scan, and diff checks on Node 24.19.0, Linux
-x86_64, git 2.51.1. Hosted GitHub runner results are intentionally not claimed
-until the pull-request matrix completes.
+x86_64, git 2.51.1.
 
-### v1.1 candidate gates
+On 23 September 2026 Claude reviewed the candidate on
+[#2](https://github.com/Dean00dev/skerry/pull/2) and found that a baseline
+written for a path containing CR or LF could not be read back. The fix and its
+regression test landed through [#3](https://github.com/Dean00dev/skerry/pull/3).
+The release head `276d847` passes **197/197 local tests** on Node 22.22.2,
+Linux x86_64, git 2.43.0, and the full hosted matrix below.
+
+### v1.1.0 release gates (`276d847`)
 
 | Gate | Result |
 | --- | --- |
-| Reconciled test suite | **196 passed, 0 failed, 0 skipped** |
+| Test suite | **197 passed, 0 failed, 0 skipped** |
 | Metadata consistency | passed, 0 notes |
-| Credential scan | clean — 59 text files, 9 patterns |
-| Strict self-scan | 59 tracked paths, 0 findings |
+| Credential scan | clean — 60 text files, 9 patterns |
+| Strict self-scan | 60 tracked paths, 0 findings |
 | Baseline live-process round trip | passed |
 | Opt-in pull-request ref process test | expected SK012 failure observed |
-| GitHub matrix and live Action jobs | **15/15 passed** — [run 32496293431](https://github.com/Dean00dev/skerry/actions/runs/32496293431) |
+| GitHub matrix and live Action jobs | **15/15 passed** — [run 35931109981](https://github.com/Dean00dev/skerry/actions/runs/35931109981) |
+| Earlier candidate run (`41d2001`, 196 tests) | 15/15 passed — [run 32496293431](https://github.com/Dean00dev/skerry/actions/runs/32496293431) |
 
 The hosted run covered Ubuntu, macOS and Windows on Node 20, 22 and 24, plus
 metadata/security checks and six live-Action jobs. The new baseline job wrote a
