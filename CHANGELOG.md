@@ -34,10 +34,19 @@ major version. Minor releases may add rules only when they are opt-in.
 
 - `check-refs` is `false` by default. Without baseline/ref inputs, v1.1 keeps
   v1.0's path rules, failure decisions, and clean-run wording.
+- SK012 and SK013 ship in a minor version despite the major-version rule for
+  new rules because they run only when `check-refs: true` is set. Pinning to
+  `@v1` still never changes results for a workflow that does not opt in.
+
+### Fixed
+
+- A baseline written by `write-baseline` for a path containing CR or LF, which
+  Git permits and SK005 flags, is now accepted by `baseline` instead of being
+  rejected as a usage error.
 
 ### Verification
 
-- 196 local tests pass on the reconciled candidate.
+- 197 local tests pass on the reconciled candidate.
 - GitHub Actions [run 32496293431](https://github.com/Dean00dev/skerry/actions/runs/32496293431)
   passed all 15 jobs: nine OS/Node test cells, metadata/security, four existing
   live-Action checks, and the new baseline/ref integration gates.
