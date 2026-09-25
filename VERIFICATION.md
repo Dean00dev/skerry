@@ -240,9 +240,8 @@ Honest gaps. None is hidden.
 Nothing in this project can do any of these, and nothing attempted to.
 
 1. Enable Issues and Private vulnerability reporting if not already enabled
-2. Open the GitHub Marketplace listing and visually confirm the description and anchor icon render as intended
 
-The published Action has now been smoke-tested from a different repository on Ubuntu, Windows and macOS; the evidence is linked in section 5.
+The published Action has now been smoke-tested from a different repository on Ubuntu, Windows and macOS; the evidence is linked in section 5. On 25 September 2026 the maintainer viewed the Marketplace listing and confirmed it shows the blue anchor icon, the name Skerry Path Guard, the expected description, and v1.1.0 as Latest.
 
 Full sequence in `RELEASE_CHECKLIST.md`.
 
