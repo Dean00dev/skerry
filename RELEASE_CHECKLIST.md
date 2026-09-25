@@ -40,7 +40,7 @@ publishes, pushes, or registers anything by itself.
 - [ ] Confirm **Publish this Action to the GitHub Marketplace** remains selected
 - [ ] Confirm the accepted Marketplace name remains **Skerry Path Guard**
 - [ ] Primary category: **Code quality**. Secondary: **Utilities**
-- [x] Tag: `v1.0.1`
+- [x] Tag: `v1.1.0`
 - [x] Release title and notes: copy from `MARKETPLACE.md`
 - [x] Publish
 
@@ -48,12 +48,12 @@ publishes, pushes, or registers anything by itself.
 
 - [x] Create or move the major `v1` ref so `@v1` resolves. Skerry currently
       maintains this as a branch:
-      `git branch -f v1 v1.0.1 && git push -f origin v1`
+      `git branch -f v1 v1.1.0 && git push -f origin v1`
 - [ ] Open the Marketplace listing and confirm the description and icon render
-- [ ] Test the published Action from a **different** repository, pinned to
+- [x] Test the published Action from a **different** repository, pinned to
       `@v1`, and confirm it runs. Until this is done, "works as a published
       Action" is untested
-- [x] Update `CHANGELOG.md` to move `1.0.1` from unreleased to the release date
+- [x] Update `CHANGELOG.md` to move `1.1.0` from unreleased to the release date
 
 ## For each later release
 

@@ -138,16 +138,16 @@ Requires file modes, so it is available from the `git` and `fs` sources, and fro
 ## SK012 · ref-name-hazard · error · opt-in
 
 **Fires when** a locally available branch or tag has a component matching a
-Windows reserved device name, contains `<`, `>`, `"` or `|`, or ends in a dot
-or space. Git permits these shapes even though Windows cannot store the ref
+Windows reserved device name, contains `<`, `>`, `"`, `|` or a control character
+U+0000–U+001F, or has a component ending in a dot or space. Git permits these shapes even though Windows cannot store the ref
 file reliably.
 
 **Why** Git represents branches and tags below its ref namespace. A contributor
 can therefore create a branch that is legal to Git but unusable on Windows.
 
 **Boundaries** Enable with `check-refs: true`. Skerry makes no network request
-and sees only refs present in the checkout plus the pull-request head exposed by
-the runner. Git already rejects other illegal ref characters. `COM0` and `LPT0`
+and sees only refs present in the checkout plus the ref exposed by the runner: the
+pull-request head, or `GITHUB_REF_NAME` outside pull requests. Git already rejects other illegal ref characters. `COM0` and `LPT0`
 are not treated as reserved device names because Windows does not reserve them.
 
 ## SK013 · ref-case-collision · error · opt-in

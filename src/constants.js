@@ -110,7 +110,7 @@ const RULES = Object.freeze({
     name: 'ref-name-hazard',
     severity: SEVERITY.ERROR,
     summary: 'A branch or tag name cannot be represented on a Windows filesystem.',
-    help: 'Git stores refs as files. Names containing a reserved device component or < > " | cannot be represented by Windows.',
+    help: 'Git stores refs as files. Names containing a reserved device component, < > " |, a control character, or a component ending in a dot or space cannot be represented by Windows.',
   },
   SK013: {
     id: 'SK013',

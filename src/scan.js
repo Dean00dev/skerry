@@ -346,6 +346,7 @@ function scan(entries, options = {}) {
 
 module.exports = {
   scan,
+  sortFindings,
   buildNodes,
   classifyCollision,
   codePointSpelling,

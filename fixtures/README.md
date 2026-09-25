@@ -40,3 +40,7 @@ tab, so symlink rules can be exercised:
 | `unsafe/deceptive.txt` | SK009, SK011 |
 | `unsafe/symlink-collision.txt` | SK001, SK010 |
 | `unsafe/injection.txt` | SK005 and friends, plus proof that the output cannot be hijacked |
+
+SK012 and SK013 check branch and tag names, not paths, so they have no manifest
+fixture. They are covered in `test/baseline-and-refs.test.js` and
+`test/v11-e2e.test.js`.
