@@ -49,7 +49,7 @@ publishes, pushes, or registers anything by itself.
 - [x] Create or move the major `v1` ref so `@v1` resolves. Skerry currently
       maintains this as a branch:
       `git branch -f v1 v1.1.0 && git push -f origin v1`
-- [ ] Open the Marketplace listing and confirm the description and icon render
+- [x] Open the Marketplace listing and confirm the description and icon render
 - [x] Test the published Action from a **different** repository, pinned to
       `@v1`, and confirm it runs. Until this is done, "works as a published
       Action" is untested
