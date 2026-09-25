@@ -240,7 +240,9 @@ Honest gaps. None is hidden.
 Nothing in this project can do any of these, and nothing attempted to.
 
 1. Enable Issues and Private vulnerability reporting if not already enabled
-2. Test the published Action from a different repository and operating system
+2. Open the GitHub Marketplace listing and visually confirm the description and anchor icon render as intended
+
+The published Action has now been smoke-tested from a different repository on Ubuntu, Windows and macOS; the evidence is linked in section 5.
 
 Full sequence in `RELEASE_CHECKLIST.md`.
 
