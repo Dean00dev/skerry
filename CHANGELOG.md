@@ -16,12 +16,19 @@ major version. Minor releases may add rules only when they are opt-in.
 
 ### Fixed
 
+- The source entry cap is raised from 500,000 to 1,000,000. The old cap made
+  Skerry fail outright on Chromium (507,720 paths) and CocoaPods/Specs
+  (849,953). Both now scan in 10 s and 20 s with 0.8 GB and 1.65 GB peak RSS.
 - SK012's help text now lists every shape it flags: control characters and
   components ending in a dot or space, as well as reserved names and `< > " |`.
 - With `check-refs: true`, merged path and ref findings now use the same
   severity, path, rule, message order as path findings alone.
 - Output, summary and report write errors are cut to their first line, as the
   threat model states.
+- `VERIFICATION.md` records a 58-repository real-world corpus: 3,047,758 paths,
+  41 errors, all inspected and all genuine, and no false positives. It
+  includes Linux, Chromium, Firefox, LLVM and IntelliJ. `scripts/corpus.sh`
+  reproduces it.
 - Documentation now agrees with the code on ref sources, the new-rule version
   policy, CI job counts and release state.
 

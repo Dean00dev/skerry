@@ -18,7 +18,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
 
-const MAX_ENTRIES = 500000;
+const MAX_ENTRIES = 1000000;
 const MAX_DEPTH = 100;
 const GIT_BUFFER_BYTES = 256 * 1024 * 1024;
 const LIST_BUFFER_BYTES = 256 * 1024 * 1024;

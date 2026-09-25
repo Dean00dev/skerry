@@ -92,11 +92,11 @@ opt-in branch and tag names — is treated as hostile.
 
 **Attack.** A repository with a million files, a 10,000-deep tree, a symlink loop, or 50,000 colliding names, aimed at hanging the runner or exhausting memory.
 
-**Defence.** Every source is capped at 500,000 entries and 100 levels of depth, and crossing a cap is a usage error rather than a truncated success. The filesystem walk is iterative, streams each directory and never follows symlinks. Git output and list manifests are capped at 256 MiB; manifest size is checked before reading. Findings output is capped at `max-findings`, default 500, while the pass/fail decision still uses the full set. Ignore patterns are capped at 200 patterns of 512 characters, and compile to regular expressions that cannot backtrack catastrophically.
+**Defence.** Every source is capped at 1,000,000 entries and 100 levels of depth, and crossing a cap is a usage error rather than a truncated success. The filesystem walk is iterative, streams each directory and never follows symlinks. Git output and list manifests are capped at 256 MiB; manifest size is checked before reading. Findings output is capped at `max-findings`, default 500, while the pass/fail decision still uses the full set. Ignore patterns are capped at 200 patterns of 512 characters, and compile to regular expressions that cannot backtrack catastrophically.
 
 **Tests.** `test/sources.test.js` builds a symlink loop and asserts immediate termination, then exercises the entry and depth caps at small injected limits and asserts a failure rather than partial results. `test/match.test.js` throws 60 nested `**/` patterns at a 4,000 character subject with a one second budget. `test/scan-options.test.js` and `test/e2e.test.js` cover findings-output truncation.
 
-**Residual risk.** The caps are generous. A repository near the 500,000 entry limit will use meaningful memory holding the path list. This is bounded, not free.
+**Residual risk.** The caps are generous. A repository near the 1,000,000 entry limit will use meaningful memory holding the path list: 850,000 paths measured 1.65 GB peak RSS (see `VERIFICATION.md`). This is bounded, not free.
 
 ---
 
