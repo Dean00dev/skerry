@@ -80,6 +80,25 @@ test('JSON receipts expose aggregate baseline state without suppressed findings'
   const result = run(root, ['--source', 'list', '--paths-file', list, '--baseline', baseline, '--report-json', report]);
   assert.equal(result.status, 0);
   const receipt = JSON.parse(fs.readFileSync(report, 'utf8'));
-  assert.deepEqual(receipt.baseline, { configured: true, suppressed: 1, stale: 0 });
+  assert.deepEqual(receipt.baseline, { configured: true, suppressed: 1, stale: 0, staleEntries: [] });
   assert.deepEqual(receipt.findings, []);
+});
+
+test('stale baseline entries are named in the JSON receipt and job summary', () => {
+  const root = dir();
+  const baseline = path.join(root, 'baseline.json');
+  run(root, ['--source', 'list', '--paths-file', manifest(root, 'nul\na|b.\n'), '--write-baseline', baseline]);
+  const report = path.join(root, 'report.json');
+  const summary = path.join(root, 'summary.md');
+  const result = run(root, ['--source', 'list', '--paths-file', manifest(root, 'safe.txt\n'), '--baseline', baseline,
+    '--report-json', report], { GITHUB_STEP_SUMMARY: summary });
+  assert.equal(result.status, 0);
+  const receipt = JSON.parse(fs.readFileSync(report, 'utf8'));
+  assert.equal(receipt.baseline.stale, receipt.baseline.staleEntries.length);
+  assert.ok(receipt.baseline.staleEntries.includes('SK004 nul'));
+  assert.deepEqual(receipt.baseline.staleEntries, [...receipt.baseline.staleEntries].sort());
+  const text = fs.readFileSync(summary, 'utf8');
+  assert.ok(text.includes('### Stale baseline entries'));
+  assert.ok(text.includes('| SK004 | nul |'));
+  assert.ok(!text.includes('a|b.'), 'pipe in a stale path must be escaped in the summary table');
 });

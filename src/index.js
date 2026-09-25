@@ -159,7 +159,7 @@ function run(argv) {
     baselined = result.baselined;
     stale = result.stale;
     if (baselined) notice(inputs.annotations, `${baselined} known finding(s) suppressed by the baseline. New findings still fail.`);
-    if (stale.length) notice(inputs.annotations, `${stale.length} baseline entr${stale.length === 1 ? 'y no longer matches' : 'ies no longer match'} and should be pruned.`);
+    if (stale.length) notice(inputs.annotations, `${stale.length} baseline entr${stale.length === 1 ? 'y no longer matches' : 'ies no longer match'} and should be pruned. The job summary and JSON report list them.`);
   }
 
   if (result.findings.length > inputs.maxFindings) {
@@ -185,7 +185,7 @@ function run(argv) {
     ignorePatterns: inputs.ignorePatterns,
     checkRefs: inputs.checkRefs,
     refsScanned,
-    baseline: { configured: Boolean(inputs.baseline), suppressed: baselined, stale: stale.length },
+    baseline: { configured: Boolean(inputs.baseline), suppressed: baselined, stale: stale.length, staleEntries: stale },
   };
 
   let jsonPath = '';

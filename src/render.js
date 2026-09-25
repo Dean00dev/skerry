@@ -182,6 +182,26 @@ function renderSummary(result, meta = {}) {
     }
   }
 
+  const staleEntries = (meta.baseline && meta.baseline.staleEntries) || [];
+  if (staleEntries.length > 0) {
+    lines.push('');
+    lines.push('### Stale baseline entries');
+    lines.push('');
+    lines.push('These no longer match a finding and can be removed from the baseline.');
+    lines.push('');
+    lines.push('| Rule | Path |');
+    lines.push('| --- | --- |');
+    const rows = staleEntries.slice(0, MAX_SUMMARY_ROWS);
+    for (const entry of rows) {
+      const space = entry.indexOf(' ');
+      lines.push(`| ${escapeMarkdownCell(entry.slice(0, space))} | ${escapeMarkdownCell(sanitizeDisplay(entry.slice(space + 1)))} |`);
+    }
+    if (staleEntries.length > rows.length) {
+      lines.push('');
+      lines.push(`_${staleEntries.length - rows.length} further stale entr${staleEntries.length - rows.length === 1 ? 'y' : 'ies'} not shown; see the JSON report._`);
+    }
+  }
+
   if (result.truncated) {
     lines.push('');
     lines.push(`_Output truncated: ${result.total} finding(s) in total._`);
