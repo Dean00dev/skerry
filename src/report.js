@@ -27,7 +27,12 @@ function buildJsonReport(result, meta = {}) {
     counts: result.counts,
     truncated: result.truncated,
     refsScanned: meta.refsScanned || 0,
-    baseline: meta.baseline || { configured: false, suppressed: 0, stale: 0 },
+    baseline: {
+      configured: Boolean(meta.baseline && meta.baseline.configured),
+      suppressed: (meta.baseline && meta.baseline.suppressed) || 0,
+      stale: (meta.baseline && meta.baseline.stale) || 0,
+      staleEntries: [...((meta.baseline && meta.baseline.staleEntries) || [])],
+    },
     findings: result.findings.map((f) => ({
       rule: f.rule,
       name: f.name,

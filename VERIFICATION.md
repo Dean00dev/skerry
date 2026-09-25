@@ -1,13 +1,14 @@
 # Verification receipt
 
 **Skerry 1.1.0** · reconciled from the released v1.0.1 tree and
-Claude's independently built v1.1 archive on 21 August 2026
+Claude's independently built v1.1 archive on 21 August 2026, reviewed and
+released on 23–24 September 2026
 
 This document exists so that nothing in this repository has to be taken on
 trust. It separates what was actually executed from what was simulated and what
 has not been demonstrated at all.
 
-Skerry is public on GitHub. Version 1.0.1 is released through the existing
+Skerry is public on GitHub. Version 1.1.0 is released through the existing
 [GitHub Marketplace](https://github.com/marketplace/actions/skerry-path-guard).
 Version 1.0.1 ran successfully in GitHub Actions on Ubuntu, macOS and
 Windows with Node 20, 22 and 24. Claude's baseline was produced locally on Node
@@ -45,7 +46,7 @@ Linux x86_64, git 2.43.0, and the full hosted matrix below.
 | Earlier candidate run (`41d2001`, 196 tests) | 15/15 passed — [run 32496293431](https://github.com/Dean00dev/skerry/actions/runs/32496293431) |
 
 The hosted run covered Ubuntu, macOS and Windows on Node 20, 22 and 24, plus
-metadata/security checks and six live-Action jobs. The new baseline job wrote a
+metadata/security checks and five live-Action jobs. The new baseline job wrote a
 ledger, consumed it, and asserted the suppression/stale outputs. The new ref
 job created a Git-valid `feature/aux` branch, observed the expected Skerry
 failure, and asserted the error/ref counts. No v1.1 hosted claim predates this
@@ -84,7 +85,7 @@ dependencies**, no `dist/`, no `node_modules/`.
 
 Executed against real code, with assertions.
 
-**Rules** — all eleven fire on their fixtures and stay silent on legitimate
+**Rules** — SK001–SK011 fire on their fixtures and stay silent on legitimate
 names. Negative coverage is deliberate and specific: `console.js`, `nullable.ts`
 and `com10.log` do not trigger SK004; a `👨‍👩‍👧` emoji filename containing
 U+200D does not trigger SK011; Arabic, Chinese, Cyrillic and accented names do
@@ -208,12 +209,17 @@ visible.
 
 Honest gaps. None is hidden.
 
-- **Marketplace acceptance is demonstrated; external use is not.** GitHub lists
-  Skerry Path Guard and release 1.0.1 publicly. This receipt has not found a
-  workflow in an unrelated repository invoking the published Action.
-- **Cross-platform Action execution is only partially demonstrated.** The full
-  test suite passes on Ubuntu, macOS and Windows, but the three live `uses: ./`
-  integration jobs execute on Ubuntu only.
+- **External use is demonstrated once, by the maintainer.** GitHub lists
+  Skerry Path Guard and release 1.1.0 publicly. On 24 September 2026 a
+  smoke-test workflow in a separate repository ran `Dean00dev/skerry@v1`,
+  resolved to `07f918e`, on Ubuntu, Windows and macOS: default and
+  `check-refs: true` invocations both passed with 0 findings and 1 ref scanned.
+  The run link is not yet recorded here. No unrelated project is known to use
+  the Action.
+- **Live Action jobs in this repository run on Ubuntu only.** The full test
+  suite passes on Ubuntu, macOS and Windows, and the published Action ran on all
+  three in the smoke test above, but the live `uses: ./` integration jobs in
+  this repository's CI execute on Ubuntu only.
 - **Independent review happened, but not human code review.** ChatGPT / Super
   Sol read and adversarially tested the code. No unaffiliated human has reviewed
   it.

@@ -51,7 +51,8 @@ because false positives were taken seriously.
 
 1. Add it to `RULES` in `src/constants.js` with the next free id. Ids are never
    reused or renumbered.
-2. Implement it in `segmentFindings` or `collisionFindings` in `src/scan.js`.
+2. Implement it in `segmentFindings` or `collisionFindings` in `src/scan.js`,
+   or in `scanRefs` in `src/refs.js` for a ref rule.
 3. Add a fixture manifest under `fixtures/unsafe/` and register it in
    `test/fixtures.test.js`.
 4. Add positive **and negative** tests. The negative ones matter more.
@@ -59,8 +60,9 @@ because false positives were taken seriously.
    add it to the README table.
 6. Run `npm run verify`. The metadata checker fails if a rule is undocumented.
 
-New rules change results for existing users, so they ship only in a major
-version.
+New rules that run by default change results for existing users, so they ship
+only in a major version. A minor release may add a rule only when it is off by
+default.
 
 ## Code style
 

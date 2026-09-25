@@ -7,6 +7,24 @@ All notable changes to this project are documented here. The format follows
 New rules that run by default change existing results and therefore require a
 major version. Minor releases may add rules only when they are opt-in.
 
+## [Unreleased]
+
+### Added
+
+- The JSON report's `baseline.staleEntries` and a job-summary table name the
+  stale baseline entries, not only their count, so they can be pruned.
+
+### Fixed
+
+- SK012's help text now lists every shape it flags: control characters and
+  components ending in a dot or space, as well as reserved names and `< > " |`.
+- With `check-refs: true`, merged path and ref findings now use the same
+  severity, path, rule, message order as path findings alone.
+- Output, summary and report write errors are cut to their first line, as the
+  threat model states.
+- Documentation now agrees with the code on ref sources, the new-rule version
+  policy, CI job counts and release state.
+
 ## [1.1.0] — 2026-09-23
 
 ### Added
@@ -48,8 +66,8 @@ major version. Minor releases may add rules only when they are opt-in.
 
 - 197 local tests pass on the reconciled candidate.
 - GitHub Actions [run 35931109981](https://github.com/Dean00dev/skerry/actions/runs/35931109981)
-  passed all 15 jobs: nine OS/Node test cells, metadata/security, four existing
-  live-Action checks, and the new baseline/ref integration gates.
+  passed all 15 jobs: nine OS/Node test cells, metadata/security, three existing
+  live-Action checks, and the two new baseline/ref integration gates.
 
 ## [1.0.1] — 2026-08-14
 

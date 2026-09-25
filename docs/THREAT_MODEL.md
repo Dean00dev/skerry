@@ -23,7 +23,7 @@ The attacker can open a pull request against a repository that runs Skerry. Ther
 The attacker does **not** control the workflow file, the Action inputs, or the runner configuration. Inputs are treated as trusted-but-validated: they come from the workflow author, and the standard warning about interpolating untrusted expressions into a workflow applies to Skerry exactly as it does to every other Action.
 
 Everything a repository can influence — filenames, path depth, file modes and
-the opt-in pull-request ref name — is treated as hostile.
+opt-in branch and tag names — is treated as hostile.
 
 ---
 
@@ -104,7 +104,7 @@ the opt-in pull-request ref name — is treated as hostile.
 
 **Attack.** Skerry leaks secrets or private repository content into a public workflow log.
 
-**Defence.** Skerry never opens a scanned repository file, so those file contents cannot leak through it. The explicit `list` source necessarily reads its caller-supplied path manifest. Skerry never reads or prints environment variables. Error messages from git and the filesystem are truncated to 200 characters and first line only, so a stack trace or environment dump cannot spill. The JSON report records how many ignore patterns ran but never the patterns themselves, since those can name internal projects.
+**Defence.** Skerry never opens a scanned repository file, so those file contents cannot leak through it. The explicit `list` source necessarily reads its caller-supplied path manifest. Skerry reads only its own inputs and the documented `GITHUB_*` variables, and prints none of them except the ref names `check-refs` reports. Error messages from git and the filesystem are cut to their first line and at most 200 characters, so a stack trace or environment dump cannot spill. The JSON report records how many ignore patterns ran but never the patterns themselves, since those can name internal projects.
 
 **Tests.** `test/e2e.test.js` asserts the log contains neither `PATH` nor the names of runner environment variables. `test/report.test.js` asserts a report containing ignore patterns does not include their text.
 

@@ -18,7 +18,7 @@ const { EXIT, TOOL_NAME, VERSION, SEVERITY_RANK } = require('./constants');
 const { resolveInputs, InputError } = require('./inputs');
 const { compileAll, PatternError } = require('./match');
 const { collect, SourceError } = require('./sources');
-const { scan } = require('./scan');
+const { scan, sortFindings } = require('./scan');
 const { collectRefs, scanRefs, RefError } = require('./refs');
 const baselineModule = require('./baseline');
 const { renderAnnotations, renderConsole, renderSummary, sanitizeDisplay } = require('./render');
@@ -53,7 +53,7 @@ function writeOutputs(values) {
   try {
     fs.appendFileSync(file, block, 'utf8');
   } catch (err) {
-    commandError(`could not write step outputs: ${String(err.message).slice(0, 120)}`);
+    commandError(`could not write step outputs: ${String(err.message).split('\n')[0].slice(0, 120)}`);
   }
 }
 
@@ -63,7 +63,7 @@ function writeSummary(text) {
   try {
     fs.appendFileSync(file, `${text}\n`, 'utf8');
   } catch (err) {
-    commandError(`could not write job summary: ${String(err.message).slice(0, 120)}`);
+    commandError(`could not write job summary: ${String(err.message).split('\n')[0].slice(0, 120)}`);
   }
 }
 
@@ -74,7 +74,7 @@ function writeReport(file, data, label) {
     fs.writeFileSync(target, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
     return target;
   } catch (err) {
-    throw new SourceError(`could not write ${label} report: ${String(err.message).slice(0, 160)}`);
+    throw new SourceError(`could not write ${label} report: ${String(err.message).split('\n')[0].slice(0, 160)}`);
   }
 }
 
@@ -125,10 +125,7 @@ function run(argv) {
       result.counts.total += 1;
     }
     result.total += refResult.findings.length;
-    result.findings = result.findings.concat(refResult.findings).sort((a, b) => {
-      const severity = SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity];
-      return severity || (a.path < b.path ? -1 : a.path > b.path ? 1 : (a.rule < b.rule ? -1 : a.rule > b.rule ? 1 : 0));
-    });
+    result.findings = sortFindings(result.findings.concat(refResult.findings));
   }
 
   if (inputs.writeBaseline) {
@@ -159,7 +156,7 @@ function run(argv) {
     baselined = result.baselined;
     stale = result.stale;
     if (baselined) notice(inputs.annotations, `${baselined} known finding(s) suppressed by the baseline. New findings still fail.`);
-    if (stale.length) notice(inputs.annotations, `${stale.length} baseline entr${stale.length === 1 ? 'y no longer matches' : 'ies no longer match'} and should be pruned.`);
+    if (stale.length) notice(inputs.annotations, `${stale.length} baseline entr${stale.length === 1 ? 'y no longer matches' : 'ies no longer match'} and should be pruned. The job summary and JSON report list them.`);
   }
 
   if (result.findings.length > inputs.maxFindings) {
@@ -185,7 +182,7 @@ function run(argv) {
     ignorePatterns: inputs.ignorePatterns,
     checkRefs: inputs.checkRefs,
     refsScanned,
-    baseline: { configured: Boolean(inputs.baseline), suppressed: baselined, stale: stale.length },
+    baseline: { configured: Boolean(inputs.baseline), suppressed: baselined, stale: stale.length, staleEntries: stale },
   };
 
   let jsonPath = '';

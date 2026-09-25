@@ -16,7 +16,7 @@ src/baseline.js       deterministic exception ledgers
 src/refs.js           bounded local branch/tag collection and checks
 ```
 
-Roughly 1,000 lines of CommonJS, no dependencies, no build step, no bundler, no `dist/` directory. The published source is the running source, so anyone can read exactly what executes in their CI.
+Roughly 1,900 lines of CommonJS, no dependencies, no build step, no bundler, no `dist/` directory. The published source is the running source, so anyone can read exactly what executes in their CI.
 
 ## Decisions
 
@@ -70,8 +70,8 @@ duplicate, unknown-rule, malformed, or count-inconsistent data.
 
 ### Ref namespaces remain separate
 
-Opt-in ref collection uses only the runner's pull-request head and local Git
-refs; it makes no network call. Branches collide only with branches and tags
+Opt-in ref collection uses only the runner's pull-request head (or, outside
+pull requests, `GITHUB_REF_NAME`) and local Git refs; it makes no network call. Branches collide only with branches and tags
 only with tags. SARIF ref results deliberately carry no physical file location.
 
 ### Nodes, not files
@@ -114,10 +114,10 @@ The one honest caveat: results depend on the Unicode data of the host's JavaScri
 ## Adding a rule
 
 1. Add it to `RULES` in `src/constants.js` with the next free id.
-2. Implement it in `segmentFindings` or `collisionFindings` in `src/scan.js`.
+2. Implement it in `segmentFindings` or `collisionFindings` in `src/scan.js`, or in `scanRefs` in `src/refs.js` for a ref rule.
 3. Add a fixture manifest under `fixtures/unsafe/` and register it in `test/fixtures.test.js`.
 4. Add positive **and negative** tests — the negative ones matter more, because a rule that fires on legitimate names is worse than no rule.
 5. Document it in `docs/RULES.md`, including when it is wrong, and add it to the README table.
 6. Run `npm run verify`. The metadata checker fails if a rule is undocumented.
 
-New rules change results for existing users, so they ship in a major version.
+New rules that run by default change results for existing users, so they ship in a major version. A minor release may add a rule only when it is off by default.

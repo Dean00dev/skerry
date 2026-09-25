@@ -1,6 +1,6 @@
 # Marketplace listing copy
 
-The accepted listing metadata and release copy for the next release.
+The accepted listing metadata and release copy for v1.1.0, the current release.
 
 ## Listing title
 
@@ -74,7 +74,7 @@ Adopt Skerry without turning an existing backlog into an instant red build—and
 
 - `check-refs` is off by default, so existing pinned v1 workflows retain their
   v1.0 path-only result until they opt in.
-- Ref checks use local refs and the pull-request head only. No network calls.
+- Ref checks use local refs and the runner's own ref only. No network calls.
 - A baseline records identity, not whether an exception is justified or safe.
 - Ref SARIF results deliberately carry no fabricated physical file location.
 
