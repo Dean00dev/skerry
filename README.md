@@ -51,6 +51,15 @@ by letter case.
 
 Findings appear as inline annotations on the pull request and as a table in the job summary. Exit code 1 fails the step.
 
+## Tested on real repositories
+
+Skerry was run against 58 public repositories totalling about 3 million paths,
+including Linux, Chromium, Firefox, LLVM and IntelliJ. Every one of its 41
+errors was a genuine hazard. They included 13 case-colliding pairs in the Linux
+netfilter code and `Async.md` / `async.md` in JavaGuide. No false positive was
+observed. Chromium's 508,000 paths scan in about 10 seconds. Full table, method
+and limits: [VERIFICATION.md](VERIFICATION.md).
+
 ## Usage
 
 ### Typical

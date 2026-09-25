@@ -96,7 +96,7 @@ Full gitignore semantics — negation, `!` re-inclusion, nested `.gitignore` pre
 | `fs` | everything on disk except a top-level `.git` | Streams directory entries rather than loading a whole directory at once. Symlinks are recorded, never followed. |
 | `list` | a path manifest | Used by the test suite; also useful for checking a path list with no checkout. The manifest is size-capped before it is read. |
 
-All three sources fail closed above 500,000 entries or 100 directory levels.
+All three sources fail closed above 1,000,000 entries or 100 directory levels.
 Git output and list manifests are each capped at 256 MiB.
 
 `auto` uses `git` inside a work tree and `fs` otherwise, emitting a notice when

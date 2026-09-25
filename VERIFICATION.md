@@ -168,6 +168,95 @@ A downstream step read the real outputs and confirmed `source=git`,
 
 ---
 
+### Real-world corpus (25 September 2026)
+
+Skerry had previously only scanned repositories it created. It was then run,
+through its normal `git` source, against 58 public repositories totalling
+**3,047,758 paths**. These included the largest widely used trees
+available (CocoaPods/Specs, Chromium, Firefox, IntelliJ, LLVM, Linux),
+repositories with Chinese, Korean and translated file names, and the
+maintainer's own public projects. Each repository was cloned shallow, blobless
+and without checkout, so only path names were downloaded.
+`scripts/corpus.sh` reproduces the run. Node 22.22.2, Linux x86_64, default
+settings, `v1.1.0` plus the unreleased changes.
+
+**Accuracy.** Skerry raised 41 errors, and every one was inspected by hand and
+is a genuine hazard:
+- **SK001:** 13 case-colliding pairs in Linux netfilter headers and sources
+  (for example `xt_TCPMSS.c` / `xt_tcpmss.c`), plus one pair of litmus tests.
+- **SK001:** `Async.md` / `async.md` in JavaGuide.
+- **SK001:** six case-colliding version directories in CocoaPods/Specs (for
+  example `4.5.2.TEST` / `4.5.2.test`).
+- **SK006:** one directory ending in a dot (`XCActionSheet.`).
+
+The 137 warnings each match their rule definition:
+- **SK008:** 94 paths of 200 to 253 characters.
+- **SK007:** 40 test-data files whose names begin with a space.
+- **SK003:** 3 decomposed (NFD) spellings of `FLYKìt`, the macOS artefact the
+  rule exists for.
+
+No false positive was observed. The Unicode sample is modest: a few hundred
+non-ASCII paths per repository. So this shows SK003 is not noisy here, not
+everywhere.
+
+**Performance.** Time and memory grow roughly linearly with path count:
+- 96k paths (Linux): 1.0 s
+- 388k paths (Firefox): 6.4 s and 420 MB
+- 508k paths (Chromium): 10.1 s and 784 MB
+- 850k paths (CocoaPods/Specs): 20.2 s and 1.65 GB peak RSS
+
+The run found that the entry cap, then 500,000, refused Chromium and
+CocoaPods/Specs outright. It was raised to 1,000,000, which both now fit
+within, and which stays inside the existing 256 MiB git output buffer.
+
+| Repository | Commit | Paths | Errors | Warnings | Rules | Time | Peak RSS |
+| --- | --- | ---: | ---: | ---: | --- | ---: | ---: |
+| `CocoaPods/Specs` | `fc0d664bb8` | 849,953 | 13 | 3 | SK001×12, SK003×3, SK006×1 | 20.19s | 1649MB |
+| `chromium/chromium` | `470d8665` | 507,720 | 0 | 1 | SK008×1 | 10.13s | 784MB |
+| `mozilla/gecko-dev` | `5836a062` | 387,841 | 0 | 0 | — | 6.42s | 420MB |
+| `JetBrains/intellij-community` | `64a435b3` | 282,188 | 0 | 125 | SK007×40, SK008×85 | 5.56s | 388MB |
+| `llvm/llvm-project` | `eae3e9e` | 185,457 | 0 | 0 | — | 2.62s | 250MB |
+| `torvalds/linux` | `165768b` | 96,047 | 26 | 0 | SK001×26 | 1.03s | 169MB |
+| `microsoft/TypeScript` | `cecc44a` | 66,672 | 0 | 0 | — | 1.18s | 154MB |
+| `rust-lang/rust` | `2c1a66d` | 63,186 | 0 | 0 | — | 0.73s | 140MB |
+| `DefinitelyTyped/DefinitelyTyped` | `b003021` | 62,856 | 0 | 0 | — | 0.55s | 141MB |
+| `dotnet/runtime` | `513b9cd` | 58,267 | 0 | 8 | SK008×8 | 1.00s | 163MB |
+| `NixOS/nixpkgs` | `c01bd126` | 54,583 | 0 | 0 | — | 0.66s | 153MB |
+| `nodejs/node` | `2b3e3db` | 51,859 | 0 | 0 | — | 0.63s | 138MB |
+| `mdn/translated-content` | `5c3d515e` | 38,059 | 0 | 0 | — | 0.69s | 154MB |
+| `tensorflow/tensorflow` | `2dd5ba0` | 36,963 | 0 | 0 | — | 0.43s | 116MB |
+| `apple/swift` | `636b3e4` | 32,881 | 0 | 0 | — | 0.39s | 123MB |
+| `kubernetes/kubernetes` | `1457aa1` | 31,400 | 0 | 0 | — | 0.40s | 115MB |
+| `home-assistant/core` | `75f066a` | 28,169 | 0 | 0 | — | 0.29s | 107MB |
+| `php/php-src` | `69ca307` | 27,936 | 0 | 0 | — | 0.32s | 112MB |
+| `freeCodeCamp/freeCodeCamp` | `ef58b73` | 19,502 | 0 | 0 | — | 0.30s | 101MB |
+| `microsoft/vscode` | `173e6ea` | 19,307 | 0 | 0 | — | 0.29s | 108MB |
+| `flutter/flutter` | `adce6d6` | 16,374 | 0 | 0 | — | 0.28s | 100MB |
+| `golang/go` | `8190b02` | 15,954 | 0 | 0 | — | 0.22s | 87MB |
+| `godotengine/godot` | `30caae9` | 14,385 | 0 | 0 | — | 0.19s | 85MB |
+| `unicode-org/icu` | `e51a884` | 14,064 | 0 | 0 | — | 0.23s | 93MB |
+| `emscripten-core/emscripten` | `fcfb73c` | 12,048 | 0 | 0 | — | 0.21s | 79MB |
+| `ruby/ruby` | `d3f0a61` | 11,782 | 0 | 0 | — | 0.16s | 78MB |
+| `Homebrew/homebrew-core` | `02984cd` | 9,171 | 0 | 0 | — | 0.08s | 71MB |
+| `facebook/react` | `d083ec1` | 7,252 | 0 | 0 | — | 0.12s | 74MB |
+| `django/django` | `a013c82` | 7,091 | 0 | 0 | — | 0.11s | 77MB |
+| `python/cpython` | `c1af94a` | 6,412 | 0 | 0 | — | 0.08s | 67MB |
+| `ansible/ansible` | `7ec731b` | 5,873 | 0 | 0 | — | 0.12s | 78MB |
+| `rails/rails` | `806c6a9` | 5,016 | 0 | 0 | — | 0.09s | 70MB |
+| `WordPress/WordPress` | `6c223ea` | 5,016 | 0 | 0 | — | 0.09s | 66MB |
+| `git/git` | `0f8e75a` | 4,852 | 0 | 0 | — | 0.10s | 65MB |
+| `microsoft/terminal` | `0b94a7e` | 3,687 | 0 | 0 | — | 0.06s | 64MB |
+| `CyC2018/CS-Notes` | `b70121d` | 2,555 | 0 | 0 | — | 0.06s | 63MB |
+| `TheAlgorithms/Python` | `b3233c9` | 1,733 | 0 | 0 | — | 0.04s | 58MB |
+| `jackfrued/Python-100-Days` | `44b2575` | 713 | 0 | 0 | — | 0.03s | 54MB |
+| `Snailclimb/JavaGuide` | `31f891d` | 627 | 2 | 0 | SK001×2 | 0.03s | 55MB |
+| `yangshun/tech-interview-handbook` | `e1d28e8` | 603 | 0 | 0 | — | 0.03s | 54MB |
+| `labuladong/fucking-algorithm` | `b1f23cb` | 500 | 0 | 0 | — | 0.02s | 53MB |
+| `ruanyf/weekly` | `bc56a8a` | 426 | 0 | 0 | — | 0.02s | 52MB |
+| `gyoogle/tech-interview-for-developer` | `41a7e91` | 239 | 0 | 0 | — | 0.02s | 52MB |
+| `JaeYeopHan/Interview_Question_for_Beginner` | `26c959a` | 31 | 0 | 0 | — | 0.01s | 46MB |
+| 14 public `Dean00dev/*` repositories | various | 508 | 0 | 0 | — | ≤0.02s each | 46MB |
+
 ## 4 · Live GitHub execution
 
 GitHub Actions run
@@ -223,13 +312,14 @@ Honest gaps. None is hidden.
 - **Independent review happened, but not human code review.** ChatGPT / Super
   Sol read and adversarially tested the code. No unaffiliated human has reviewed
   it.
-- **No real-world false positive data exists.** Skerry has never been run
-  against a repository it did not create. SK003 in particular is expected to be
-  noisy and is a warning for that reason, but that expectation is untested at
-  scale.
-- **Performance at scale is untested.** The largest live self-scan was 56 paths. Caps at
-  500,000 entries and 100 levels of depth are implemented and bounded but were
-  not exercised near their limits.
+- **Real-world data is one local corpus, not field use.** The 58-repository
+  run in section 3 found no false positives in 3,047,758 paths. But it was run
+  once, locally, by Claude. Findings from teams using Skerry in their own CI do
+  not exist yet, and the Unicode sample is modest.
+- **Scale is measured locally, not on hosted runners.** Scans of up to 850,000
+  paths were measured on a Linux container (section 3). Timing and memory on
+  GitHub's Windows and macOS runners at that size were not measured. The
+  100-level depth cap was not approached by any corpus repository.
 - **SARIF was structurally checked, not schema validated.** Version, rule
   declarations and result shape were asserted; no SARIF validator was run.
 
