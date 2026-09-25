@@ -214,8 +214,8 @@ Honest gaps. None is hidden.
   smoke-test workflow in a separate repository ran `Dean00dev/skerry@v1`,
   resolved to `07f918e`, on Ubuntu, Windows and macOS: default and
   `check-refs: true` invocations both passed with 0 findings and 1 ref scanned.
-  The run link is not yet recorded here. No unrelated project is known to use
-  the Action.
+  The evidence is [HarnessMark Actions run 35977058887](https://github.com/Dean00dev/HarnessMark/actions/runs/35977058887).
+  No unrelated project is known to use the Action.
 - **Live Action jobs in this repository run on Ubuntu only.** The full test
   suite passes on Ubuntu, macOS and Windows, and the published Action ran on all
   three in the smoke test above, but the live `uses: ./` integration jobs in
